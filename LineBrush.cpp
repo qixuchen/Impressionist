@@ -38,6 +38,15 @@ void LineBrush::BrushMove(const Point source, const Point target)
 	float angle = pDoc->getAngle()* M_PI/180;
 
 
+	drawLine(size, width, angle, source, target);
+}
+
+void LineBrush::BrushEnd(const Point source, const Point target)
+{
+	// do nothing so far
+}
+
+void LineBrush::drawLine(int size,int width, float angle, const Point source, const Point target) {
 	glBegin(GL_POLYGON);
 	SetColor(source);
 	//draw small polygon to represent line
@@ -46,9 +55,4 @@ void LineBrush::BrushMove(const Point source, const Point target)
 	glVertex2d(target.x - cos(angle)*size / 2 + sin(angle)*width / 2, target.y - sin(angle)*size / 2 - cos(angle)*width / 2);
 	glVertex2d(target.x - cos(angle)*size / 2 - sin(angle)*width / 2, target.y - sin(angle)*size / 2 + cos(angle)*width / 2);
 	glEnd();
-}
-
-void LineBrush::BrushEnd(const Point source, const Point target)
-{
-	// do nothing so far
 }

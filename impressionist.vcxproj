@@ -150,6 +150,9 @@
     <ClCompile Include="OriginalView.cpp" />
     <ClCompile Include="PaintView.cpp" />
     <ClCompile Include="PointBrush.cpp" />
+    <ClCompile Include="ScatterCircleBrush.cpp" />
+    <ClCompile Include="ScatterLineBrush.cpp" />
+    <ClCompile Include="ScatterPointBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -164,6 +167,9 @@
     <ClInclude Include="PointBrush.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
+    <ClInclude Include="ScatterCircleBrush.h" />
+    <ClInclude Include="ScatterLineBrush.h" />
+    <ClInclude Include="ScatterPointBrush.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

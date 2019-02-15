@@ -35,7 +35,7 @@ void CircleBrush::BrushMove(const Point source, const Point target)
 		return;
 	}
 	int size = pDoc->getSize();
-	drawCircle((float)size,source,target);
+	drawCircle(size,source,target);
 
 
 }
@@ -45,7 +45,7 @@ void CircleBrush::BrushEnd(const Point source, const Point target)
 	// do nothing so far
 }
 
-void CircleBrush::drawCircle(float size, const Point source, const Point target)
+void CircleBrush::drawCircle(int size, const Point source, const Point target)
 {
 
 	double angle = 2 * 3.14159 / 100;
