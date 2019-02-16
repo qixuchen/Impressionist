@@ -165,8 +165,6 @@
     <ClInclude Include="OriginalView.h" />
     <ClInclude Include="PaintView.h" />
     <ClInclude Include="PointBrush.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="resource1.h" />
     <ClInclude Include="ScatterCircleBrush.h" />
     <ClInclude Include="ScatterLineBrush.h" />
     <ClInclude Include="ScatterPointBrush.h" />

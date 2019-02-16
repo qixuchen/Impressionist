@@ -258,6 +258,19 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 	pDoc->setBrushType(type);
 }
 
+
+
+void ImpressionistUI::cb_angleChoice(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	int type = (int)v;
+
+
+	pDoc->setAngleType(type);
+}
+
 //------------------------------------------------------------
 // Clears the paintview canvas.
 // Called by the UI when the clear canvas button is pushed
@@ -298,6 +311,16 @@ void ImpressionistUI::cb_widthSlides(Fl_Widget* o, void* v)
 void ImpressionistUI::cb_angleSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nAngle = int(((Fl_Slider *)o)->value());
+}
+
+
+//-----------------------------------------------------------
+// Updates the brush alpha
+// Called by the UI when the alpha slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nAlpha = float(((Fl_Slider *)o)->value());
 }
 
 //---------------------------------- per instance functions --------------------------------------
@@ -389,7 +412,7 @@ int ImpressionistUI::getAngle()
 }
 
 //-------------------------------------------------
-// Set the brush width
+// Set the brush angle
 //-------------------------------------------------
 void ImpressionistUI::setAngle(int angle)
 {
@@ -397,6 +420,25 @@ void ImpressionistUI::setAngle(int angle)
 
 	if (angle <= 359)
 		m_BrushAngleSlider->value(m_nAngle);
+}
+
+//------------------------------------------------
+// Return the brush alpha
+//------------------------------------------------
+float ImpressionistUI::getAlpha()
+{
+	return m_nAlpha;
+}
+
+//-------------------------------------------------
+// Set the brush alpha
+//-------------------------------------------------
+void ImpressionistUI::setAlpha(float alpha)
+{
+	m_nAlpha = alpha;
+
+	if (alpha <= 1.0)
+		m_BrushAlphaSlider->value(m_nAlpha);
 }
 
 
@@ -428,6 +470,17 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
   {0}
 };
+
+
+// Angle control menu definition
+Fl_Menu_Item ImpressionistUI::AngleTypeMenu[] = {
+  {"Slider/Right Mouse",		FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)SLIDER_RIGHT_MOUSE},
+  {"Gradient",					FL_ALT + 'l', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)GRADIENT},
+  {"Brush Direction",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)BRUSH_DIRECTION},
+
+  {0}
+};
+
 
 
 
@@ -465,6 +518,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nSize = 10;
 	m_nWidth = 1;
 	m_nAngle = 0;
+	m_nAlpha = 1.0;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -478,9 +532,14 @@ ImpressionistUI::ImpressionistUI() {
 		m_ClearCanvasButton->user_data((void*)(this));
 		m_ClearCanvasButton->callback(cb_clear_canvas_button);
 
+		m_AngleTypeChoice = new Fl_Choice(112, 50, 150, 25, "&Stroke Direction");
+		m_AngleTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_AngleTypeChoice->menu(AngleTypeMenu);
+		m_AngleTypeChoice->callback(cb_angleChoice);
+
 
 		// Add brush size slider to the dialog 
-		m_BrushSizeSlider = new Fl_Value_Slider(10, 80, 300, 20, "Size");
+		m_BrushSizeSlider = new Fl_Value_Slider(10, 120, 300, 20, "Size");
 		m_BrushSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushSizeSlider->type(FL_HOR_NICE_SLIDER);
         m_BrushSizeSlider->labelfont(FL_COURIER);
@@ -494,7 +553,7 @@ ImpressionistUI::ImpressionistUI() {
 
 
 		// Add line width slider to the dialog 
-		m_BrushWidthSlider = new Fl_Value_Slider(10, 120, 300, 20, "Line Width");
+		m_BrushWidthSlider = new Fl_Value_Slider(10, 160, 300, 20, "Line Width");
 		m_BrushWidthSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushWidthSlider->type(FL_HOR_NICE_SLIDER);
 		m_BrushWidthSlider->labelfont(FL_COURIER);
@@ -508,7 +567,7 @@ ImpressionistUI::ImpressionistUI() {
 
 
 		// Add brush angle slider to the dialog 
-		m_BrushAngleSlider = new Fl_Value_Slider(10, 160, 300, 20, "Line Angle");
+		m_BrushAngleSlider = new Fl_Value_Slider(10, 200, 300, 20, "Line Angle");
 		m_BrushAngleSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushAngleSlider->type(FL_HOR_NICE_SLIDER);
 		m_BrushAngleSlider->labelfont(FL_COURIER);
@@ -519,6 +578,19 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushAngleSlider->value(m_nAngle);
 		m_BrushAngleSlider->align(FL_ALIGN_RIGHT);
 		m_BrushAngleSlider->callback(cb_angleSlides);
+
+		// Add brush alpha slider to the dialog 
+		m_BrushAlphaSlider = new Fl_Value_Slider(10, 240, 300, 20, "Alpha");
+		m_BrushAlphaSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_BrushAlphaSlider->type(FL_HOR_NICE_SLIDER);
+		m_BrushAlphaSlider->labelfont(FL_COURIER);
+		m_BrushAlphaSlider->labelsize(12);
+		m_BrushAlphaSlider->minimum(0.0);
+		m_BrushAlphaSlider->maximum(1.0);
+		m_BrushAlphaSlider->step(0.01);
+		m_BrushAlphaSlider->value(m_nAlpha);
+		m_BrushAlphaSlider->align(FL_ALIGN_RIGHT);
+		m_BrushAlphaSlider->callback(cb_alphaSlides);
 
     m_brushDialog->end();	
 

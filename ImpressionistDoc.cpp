@@ -27,10 +27,12 @@ ImpressionistDoc::ImpressionistDoc()
 {
 	// Set NULL image name as init. 
 	m_imageName[0]	='\0';	
-
+	
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
+
+	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
 
 
 	// create one instance of each brush
@@ -82,6 +84,12 @@ void ImpressionistDoc::setBrushType(int type)
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[type];
 }
 
+void ImpressionistDoc::setAngleType(int type)
+{
+	m_nAngleType = type;
+}
+
+
 //---------------------------------------------------------
 // Returns the size of the brush.
 //---------------------------------------------------------
@@ -90,6 +98,13 @@ int ImpressionistDoc::getSize()
 	return m_pUI->getSize();
 }
 
+
+//---------------------------------------------------------
+// set the size of brush
+//---------------------------------------------------------
+void ImpressionistDoc::setSize(int size) {
+	m_pUI->setSize(size);
+}
 
 //---------------------------------------------------------
 // Returns the width
@@ -105,6 +120,25 @@ int ImpressionistDoc::getWidth()
 int ImpressionistDoc::getAngle()
 {
 	return m_pUI->getAngle();
+}
+
+
+//---------------------------------------------------------
+// set the angle
+//---------------------------------------------------------
+void ImpressionistDoc::setAngle(int angle) {
+	m_pUI->setAngle(angle);
+}
+
+
+
+
+//---------------------------------------------------------
+// Returns the alpha
+//---------------------------------------------------------
+float ImpressionistDoc::getAlpha()
+{
+	return m_pUI->getAlpha();
 }
 
 //---------------------------------------------------------
@@ -221,4 +255,8 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
 }
+
+
+
+
 

@@ -25,12 +25,15 @@ public:
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	void	setBrushType(int type);			// called by the UI to set the brushType
+	void	setAngleType(int type);			// called by the UI to set the AngleType
 	int		getSize();						// get the brush size
 	void	setSize(int size);				// set the brush size
 	int		getWidth();						// get the brush width 
-	void	setWidth(int width);				// set the brush width
+	void	setWidth(int width);			// set the brush width
 	int		getAngle();						// get the brush angle
-	void	setAngle(int angle);				// set the brush angle
+	void	setAngle(int angle);			// set the brush angle
+	float	getAlpha();						// get the brush alpha
+	void	setAlpha(float alpha);			// set the brush alpha
 	char*	getImageName();					// get the current image name
 	
 
@@ -50,7 +53,8 @@ public:
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
 	// Size of the brush.
-	int m_nSize;							
+	int m_nSize;
+	int m_nAngleType;
 
 	ImpressionistUI*	m_pUI;
 
