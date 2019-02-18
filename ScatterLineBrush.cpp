@@ -24,6 +24,16 @@ void ScatterLineBrush::BrushMove(const Point source, const Point target)
 	int width = pDoc->getWidth();
 	float angle = pDoc->getAngle()* M_PI / 180;
 
+
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// These two lines do not work between glBegin() and glEnd()
+	//New color in framebuffer =
+	//	current alpha in framebuffer * current color in framebuffer +
+	//	(1 - current alpha in framebuffer) * shader's output color
+
+
 	//first line
 	drawLine(size, width, angle, source, target);
 

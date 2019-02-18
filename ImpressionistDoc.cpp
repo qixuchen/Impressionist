@@ -55,7 +55,6 @@ ImpressionistDoc::ImpressionistDoc()
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
-
 }
 
 
@@ -82,6 +81,16 @@ char* ImpressionistDoc::getImageName()
 void ImpressionistDoc::setBrushType(int type)
 {
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[type];
+	if (!strcmp(m_pCurrentBrush->BrushName(),"Lines") || !strcmp(m_pCurrentBrush->BrushName(), "Scattered Lines")) {// enable width, angle and angle control
+		m_pUI->m_BrushWidthSlider->activate();
+		m_pUI->m_BrushAngleSlider->activate();
+		m_pUI->m_AngleTypeChoice->activate();
+	}
+	else {
+		m_pUI->m_BrushWidthSlider->deactivate();
+		m_pUI->m_BrushAngleSlider->deactivate();
+		m_pUI->m_AngleTypeChoice->deactivate();
+	}
 }
 
 void ImpressionistDoc::setAngleType(int type)

@@ -103,6 +103,22 @@ void PaintView::draw()
 		// Clear it after processing.
 		isAnEvent	= 0;	
 
+		//BELL: clip brush stroke
+
+		if (coord.x < 0) {
+			coord.x = 0;
+		}
+		else if (coord.x > m_nDrawWidth) {
+			coord.x = m_nDrawWidth;
+		}
+		if (coord.y < 0) {
+			coord.y = 0;
+		}
+		else if (coord.y > m_nDrawHeight) {
+			coord.y = m_nDrawHeight;
+		}
+		//BELL: clip brush stroke
+
 		Point source( coord.x + m_nStartCol, m_nEndRow - coord.y );
 		Point target( coord.x, m_nWindowHeight - coord.y );
 
@@ -148,7 +164,7 @@ void PaintView::draw()
 			RestoreContent();
 			grad_end.x = coord.x;
 			grad_end.y = m_nWindowHeight - coord.y;
-			m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180));
+			m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180)+180);
 			m_pDoc->setSize((int)sqrt(pow((grad_end.x - grad_start.x), 2) + pow((grad_end.y - grad_start.y), 2)));
 
 			break;
@@ -209,12 +225,16 @@ int PaintView::handle(int event)
 	case FL_MOVE:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
+
 		break;
 	default:
 		return 0;
 		break;
 
 	}
+
+	//m_pDoc->m_pUI->m_origView->refresh();
+	//m_pDoc->m_pUI->m_origView->showSource();
 
 
 

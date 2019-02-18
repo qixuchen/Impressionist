@@ -43,13 +43,7 @@ char* ImpBrush::BrushName(void)
 void ImpBrush::SetColor (const Point source)
 
 {
-	//glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
-	// above code does the following:
-	//New color in framebuffer =
-	//	current alpha in framebuffer * current color in framebuffer +
-	//	(1 - current alpha in framebuffer) * shader's output color
+
 
 	ImpressionistDoc* pDoc = GetDocument();
 
@@ -57,5 +51,5 @@ void ImpBrush::SetColor (const Point source)
 
 	memcpy ( color, pDoc->GetOriginalPixel( source ), 3 );
 	
-	glColor3ubv(color);
+	glColor4f((GLfloat)color[0]/255, (GLfloat)color[1] / 255, (GLfloat)color[2] / 255,pDoc->getAlpha());
 }

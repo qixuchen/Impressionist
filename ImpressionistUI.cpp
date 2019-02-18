@@ -536,6 +536,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_AngleTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
 		m_AngleTypeChoice->menu(AngleTypeMenu);
 		m_AngleTypeChoice->callback(cb_angleChoice);
+		m_AngleTypeChoice->deactivate();
 
 
 		// Add brush size slider to the dialog 
@@ -564,6 +565,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushWidthSlider->value(m_nWidth);
 		m_BrushWidthSlider->align(FL_ALIGN_RIGHT);
 		m_BrushWidthSlider->callback(cb_widthSlides);
+		m_BrushWidthSlider->deactivate();
 
 
 		// Add brush angle slider to the dialog 
@@ -578,6 +580,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushAngleSlider->value(m_nAngle);
 		m_BrushAngleSlider->align(FL_ALIGN_RIGHT);
 		m_BrushAngleSlider->callback(cb_angleSlides);
+		m_BrushAngleSlider->deactivate();
 
 		// Add brush alpha slider to the dialog 
 		m_BrushAlphaSlider = new Fl_Value_Slider(10, 240, 300, 20, "Alpha");

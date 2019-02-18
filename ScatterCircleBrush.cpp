@@ -18,6 +18,14 @@ void ScatterCircleBrush::BrushMove(const Point source, const Point target) {
 
 	int size = pDoc->getSize();
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// These two lines do not work between glBegin() and glEnd()
+	//New color in framebuffer =
+	//	current alpha in framebuffer * current color in framebuffer +
+	//	(1 - current alpha in framebuffer) * shader's output color
+
+
 	//draw the original circle
 	drawCircle((float)size, source, target);
 
