@@ -31,6 +31,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
+	m_ucGradient = NULL;
 
 	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
 
@@ -204,6 +205,36 @@ int ImpressionistDoc::loadImage(char *iname)
 	return 1;
 }
 
+//---------------------------------------------------------
+// Load the specified image
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::loadGrad(char *iname)
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width,height;
+
+	if ((data = readBMP(iname, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	// reflect the fact of loading the new image
+	m_nGradWidth = width;
+	m_nGradHeight = height;
+
+	// release old storage
+	if (m_ucGradient) delete[] m_ucGradient;
+
+	m_ucGradient = data;
+
+
+	return 1;
+}
+
 
 //----------------------------------------------------------------
 // Save the specified image
@@ -268,7 +299,29 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 	return GetOriginalPixel( p.x, p.y );
 }
 
+//------------------------------------------------------------------
+// Get pixel of the grad iamge
+//------------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetGradPixel(int x, int y)
+{
+	if (x%m_nGradWidth== (m_nGradWidth - 1)||x%m_nGradWidth==0)
+		x = 1;
+	else x = x%m_nGradWidth;
 
+	if (y%m_nGradHeight==(m_nGradHeight - 1)||y%m_nGradHeight==0)
+		y = 1;
+	else y = y%m_nGradHeight;
+
+	return (GLubyte*)(m_ucGradient + 3 * (y*m_nGradWidth + x));
+}
+
+//----------------------------------------------------------------
+// Get pixel of the grad iamge
+//----------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetGradPixel(const Point p)
+{
+	return GetGradPixel(p.x, p.y);
+}
 
 /*void ImpressionistDoc::swapOriginPaint() {
 	unsigned char* temp = NULL;

@@ -21,6 +21,7 @@ public:
 
 	int		loadImage(char *iname);			// called by the UI to load image
 	int		saveImage(char *iname);			// called by the UI to save image
+	int		loadGrad(char *iname);			// called by the UI to load  GRADIENT image
 
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
@@ -46,11 +47,20 @@ public:
 	// Dimensions of the paint window.
 	int				m_nPaintWidth, 
 					m_nPaintHeight;	
+
+	//Dimensions of the gradient image window.
+	int				m_nGradWidth,
+					m_nGradHeight;
+
+
 	// Bitmaps for original image and painting.
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucPainting;
 	// Bitmaps used for undo.
 	unsigned char* m_ucsave;
+
+	//Bitmaps for gradient.
+	unsigned char* m_ucGradient;
 
 
 	// The current active brush.
@@ -67,7 +77,10 @@ public:
 	GLubyte* GetOriginalPixel( int x, int y );   
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetOriginalPixel( const Point p );  
-
+	// Get the color of the original picture at the specified coord
+	GLubyte* GetGradPixel(int x, int y);
+	// Get the color of the original picture at the specified point	
+	GLubyte* GetGradPixel(const Point p);
 
 private:
 	char			m_imageName[256];

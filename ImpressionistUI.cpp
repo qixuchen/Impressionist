@@ -185,6 +185,20 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 
 
 //------------------------------------------------------------------
+// load gradient image
+//------------------------------------------------------------------
+void ImpressionistUI::cb_load_grad(Fl_Menu_* o, void* v)
+{
+	ImpressionistDoc *pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadGrad(newfile);
+	}
+	whoami(o)->AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].activate();
+}
+
+//------------------------------------------------------------------
 // Brings up a file chooser and then saves the painted image
 // This is called by the UI when the save image menu item is chosen
 //------------------------------------------------------------------
@@ -518,6 +532,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes }, 
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
 		{ "&Color",	FL_ALT + 'o', (Fl_Callback *)ImpressionistUI::cb_Color },
+		{ "&Import Gradient Image",	FL_ALT + 'i', (Fl_Callback *)ImpressionistUI::cb_load_grad },
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
 
@@ -549,7 +564,7 @@ Fl_Menu_Item ImpressionistUI::AngleTypeMenu[] = {
   {"Slider/Right Mouse",		FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)SLIDER_RIGHT_MOUSE},
   {"Gradient",					FL_ALT + 'l', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)GRADIENT},
   {"Brush Direction",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)BRUSH_DIRECTION},
-
+  {"Follow Image",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)FOLLOW_ANOTHER_IMAGE},
   {0}
 };
 
@@ -592,6 +607,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nAngle = 0;
 	m_nAlpha = 1.0;
 	m_nRed = m_nGreen = m_nBlue = 0;
+	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");

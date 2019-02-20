@@ -32,7 +32,11 @@ void ScatterLineBrush::BrushMove(const Point source, const Point target)
 		prev.y = cur.y;
 	}
 	else if (pDoc->m_nAngleType == ImpressionistUI::GRADIENT) { // when angle control is the gradient
-		setGradient(source);
+		setGradientByOrigin(source);
+
+	}
+	else if (pDoc->m_nAngleType == ImpressionistUI::FOLLOW_ANOTHER_IMAGE) { // when angle control is the gradient of an IMAGE
+		setGradientByImg(source);
 
 	}
 

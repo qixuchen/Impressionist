@@ -18,7 +18,8 @@ public:
 	void BrushMove(const Point source, const Point target);
 	void BrushEnd(const Point source, const Point target);
 	void drawLine(int size, int width, float angle, const Point source, const Point target);
-	void setGradient(Point source);
+	void setGradientByOrigin(Point source);
+	void setGradientByImg(Point source);
 	char* BrushName(void);
 protected:
 	//these two point are used to catch the motion of mouse

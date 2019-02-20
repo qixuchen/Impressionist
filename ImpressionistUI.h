@@ -45,7 +45,8 @@ public:
 	enum anglemode{
 		SLIDER_RIGHT_MOUSE = 0,
 		GRADIENT,
-		BRUSH_DIRECTION
+		BRUSH_DIRECTION,
+		FOLLOW_ANOTHER_IMAGE
 	};
 
 	Fl_Slider*			m_BrushSizeSlider;
@@ -120,6 +121,7 @@ public:
 	static void	cb_brushes(Fl_Menu_* o, void* v);
 	static void	cb_clear_canvas(Fl_Menu_* o, void* v);
 	static void	cb_Color(Fl_Menu_* o, void* v);
+	static void	cb_load_grad(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_undo(Fl_Menu_* o, void* v);
 	static void	cb_swap(Fl_Menu_* o, void* v);
