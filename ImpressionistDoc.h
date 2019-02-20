@@ -36,6 +36,7 @@ public:
 	void	setAlpha(float alpha);			// set the brush alpha
 	char*	getImageName();					// get the current image name
 	
+	void    swapOriginPaint();
 
 // Attributes
 public:

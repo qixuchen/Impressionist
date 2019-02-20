@@ -6,6 +6,9 @@
 #include "impressionistUI.h"
 #include "LineBrush.h"
 #include <math.h>
+#include <numeric>
+
+
 
 extern float frand();
 
@@ -46,7 +49,7 @@ void LineBrush::BrushMove(const Point source, const Point target)
 		prev.y = cur.y;
 	}
 	else if (pDoc->m_nAngleType == ImpressionistUI::GRADIENT) { // when angle control is the gradient
-		pDoc->setAngle(computeGradient(source));
+		setGradient(source);
 
 	}
 
@@ -80,6 +83,33 @@ void LineBrush::drawLine(int size,int width, float angle, const Point source, co
 	glEnd();
 }
 
-int LineBrush::computeGradient(const Point source) {
-	return 0;
+void LineBrush::setGradient(Point source) {
+	ImpressionistDoc* pDoc = GetDocument();
+
+	//In case source point is at edge
+	if (source.x < 1) source.x = 1;
+	else if (source.x > (pDoc->m_nWidth-2)) source.x = pDoc->m_nWidth - 2;
+
+	if (source.y < 1)source.y = 1;
+	else if (source.y > pDoc->m_nHeight-2)
+		source.y = pDoc->m_nHeight - 2;
+	
+	GLubyte color[3];
+	double grayscope[9];
+	double grad_x_coef[9] = {-1,0,1, -2,0,2, -1,0,1};
+	double grad_y_coef[9] = { 1,2,1, 0,0,0, -1,-2,-1 };
+
+	//calculate grayscope of surrounding pixels
+	for (int i = 1; i >-2; i--) {
+		for (int j = -1; j < 2; j++) {
+			memcpy(color, pDoc->GetOriginalPixel(source.x+j,source.y+i), 3);
+			grayscope[(1-i) * 3 + j + 1] = (0.2126 *(GLdouble)color[0] + 0.7152 * (GLdouble)color[1] + 0.0722 * (GLdouble)color[2]) / 255;
+		}
+	}
+	double x_grad, y_grad;
+	x_grad = std::inner_product(std::begin(grayscope), std::end(grayscope), std::begin(grad_x_coef), 0.0);
+	y_grad = std::inner_product(std::begin(grayscope), std::end(grayscope), std::begin(grad_y_coef), 0.0);
+	pDoc->setAngle((int)(atan( y_grad/ x_grad) / M_PI * 180) + 90);
+
 }
+

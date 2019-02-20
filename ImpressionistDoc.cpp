@@ -267,5 +267,13 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 
 
 
-
+/*void ImpressionistDoc::swapOriginPaint() {
+	unsigned char* temp = NULL;
+	temp = m_ucBitmap;
+	m_ucBitmap = m_ucPainting;
+	m_ucPainting = temp;
+	m_pUI->m_origView->refresh();
+	printf("1");
+	m_pUI->m_paintView->refresh();
+}*/
 

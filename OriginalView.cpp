@@ -99,11 +99,12 @@ void OriginalView::resizeWindow(int	width,
 
 void OriginalView::showSource(int x, int y) {
 
-	glPointSize(5);
+	glPointSize(50);
 	glBegin(GL_POINTS);
 	glColor3f(1.0, 0.0, 0.0);
-	glVertex2d(x, y);
+	glVertex2d(100, 100);
 	
 	glEnd();
 	glFlush();
+	redraw();
 }

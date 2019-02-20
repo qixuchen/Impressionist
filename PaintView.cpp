@@ -166,7 +166,6 @@ void PaintView::draw()
 			grad_end.y = m_nWindowHeight - coord.y;
 			m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180)+180);
 			m_pDoc->setSize((int)sqrt(pow((grad_end.x - grad_start.x), 2) + pow((grad_end.y - grad_start.y), 2)));
-
 			break;
 
 		default:
@@ -232,11 +231,6 @@ int PaintView::handle(int event)
 		break;
 
 	}
-
-	//m_pDoc->m_pUI->m_origView->refresh();
-	//m_pDoc->m_pUI->m_origView->showSource();
-
-
 
 	return 1;
 }
