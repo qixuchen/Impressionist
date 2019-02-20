@@ -30,6 +30,9 @@ public:
 
 	void resizeWindow(int width, int height);
 
+	void showSource(int x, int y);
+
+
 	ImpressionistDoc*	m_pDoc;
 
 private:

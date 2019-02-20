@@ -30,6 +30,10 @@ public:
 
 	void RestoreContent();
 
+	void Undo();
+
+	void SwapOrgPnt();
+
 	ImpressionistDoc *m_pDoc;
 
 private:
@@ -42,6 +46,7 @@ private:
 			m_nEndCol,
 			m_nWindowWidth, 
 			m_nWindowHeight;
+
 
 };
 

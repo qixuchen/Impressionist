@@ -26,6 +26,7 @@ OriginalView::OriginalView(int			x,
 
 void OriginalView::draw()
 {
+
 	if(!valid())
 	{
 		glClearColor(0.7f, 0.7f, 0.7f, 1.0);
@@ -75,10 +76,15 @@ void OriginalView::draw()
 		glDrawBuffer( GL_BACK );
 		glDrawPixels( drawWidth, drawHeight, GL_RGB, GL_UNSIGNED_BYTE, bitstart );
 
+
 	}
+
 			
+
 	glFlush();
 }
+
+
 
 void OriginalView::refresh()
 {
@@ -91,3 +97,14 @@ void OriginalView::resizeWindow(int	width,
 	resize(x(), y(), width, height);
 }
 
+void OriginalView::showSource(int x, int y) {
+
+	glPointSize(50);
+	glBegin(GL_POINTS);
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex2d(100, 100);
+	
+	glEnd();
+	glFlush();
+	redraw();
+}

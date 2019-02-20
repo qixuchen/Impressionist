@@ -14,6 +14,11 @@
 
 // Include individual brush headers here.
 #include "PointBrush.h"
+#include "CircleBrush.h"
+#include "LineBrush.h"
+#include "ScatterPointBrush.h"
+#include "ScatterLineBrush.h"
+#include "ScatterCircleBrush.h"
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -22,10 +27,13 @@ ImpressionistDoc::ImpressionistDoc()
 {
 	// Set NULL image name as init. 
 	m_imageName[0]	='\0';	
-
+	
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
+	m_ucGradient = NULL;
+
+	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
 
 
 	// create one instance of each brush
@@ -36,19 +44,18 @@ ImpressionistDoc::ImpressionistDoc()
 
 	// Note: You should implement these 5 brushes.  They are set the same (PointBrush) for now
 	ImpBrush::c_pBrushes[BRUSH_LINES]				
-		= new PointBrush( this, "Lines" );
+		= new LineBrush( this, "Lines" );
 	ImpBrush::c_pBrushes[BRUSH_CIRCLES]				
-		= new PointBrush( this, "Circles" );
+		= new CircleBrush( this, "Circles" );
 	ImpBrush::c_pBrushes[BRUSH_SCATTERED_POINTS]	
-		= new PointBrush( this, "Scattered Points" );
+		= new ScatterPointBrush( this, "Scattered Points" );
 	ImpBrush::c_pBrushes[BRUSH_SCATTERED_LINES]		
-		= new PointBrush( this, "Scattered Lines" );
+		= new ScatterLineBrush( this, "Scattered Lines" );
 	ImpBrush::c_pBrushes[BRUSH_SCATTERED_CIRCLES]	
-		= new PointBrush( this, "Scattered Circles" );
+		= new ScatterCircleBrush( this, "Scattered Circles" );
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
-
 }
 
 
@@ -75,7 +82,23 @@ char* ImpressionistDoc::getImageName()
 void ImpressionistDoc::setBrushType(int type)
 {
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[type];
+	if (!strcmp(m_pCurrentBrush->BrushName(),"Lines") || !strcmp(m_pCurrentBrush->BrushName(), "Scattered Lines")) {// enable width, angle and angle control
+		m_pUI->m_BrushWidthSlider->activate();
+		m_pUI->m_BrushAngleSlider->activate();
+		m_pUI->m_AngleTypeChoice->activate();
+	}
+	else {
+		m_pUI->m_BrushWidthSlider->deactivate();
+		m_pUI->m_BrushAngleSlider->deactivate();
+		m_pUI->m_AngleTypeChoice->deactivate();
+	}
 }
+
+void ImpressionistDoc::setAngleType(int type)
+{
+	m_nAngleType = type;
+}
+
 
 //---------------------------------------------------------
 // Returns the size of the brush.
@@ -83,6 +106,49 @@ void ImpressionistDoc::setBrushType(int type)
 int ImpressionistDoc::getSize()
 {
 	return m_pUI->getSize();
+}
+
+
+//---------------------------------------------------------
+// set the size of brush
+//---------------------------------------------------------
+void ImpressionistDoc::setSize(int size) {
+	m_pUI->setSize(size);
+}
+
+//---------------------------------------------------------
+// Returns the width
+//---------------------------------------------------------
+int ImpressionistDoc::getWidth()
+{
+	return m_pUI->getWidth();
+}
+
+//---------------------------------------------------------
+// Returns the angle
+//---------------------------------------------------------
+int ImpressionistDoc::getAngle()
+{
+	return m_pUI->getAngle();
+}
+
+
+//---------------------------------------------------------
+// set the angle
+//---------------------------------------------------------
+void ImpressionistDoc::setAngle(int angle) {
+	m_pUI->setAngle(angle);
+}
+
+
+
+
+//---------------------------------------------------------
+// Returns the alpha
+//---------------------------------------------------------
+float ImpressionistDoc::getAlpha()
+{
+	return m_pUI->getAlpha();
 }
 
 //---------------------------------------------------------
@@ -119,6 +185,9 @@ int ImpressionistDoc::loadImage(char *iname)
 	m_ucPainting	= new unsigned char [width*height*3];
 	memset(m_ucPainting, 0, width*height*3);
 
+	m_ucsave = new unsigned char[width*height * 3];
+	memset(m_ucsave, 0, width*height*3);
+
 	m_pUI->m_mainWindow->resize(m_pUI->m_mainWindow->x(), 
 								m_pUI->m_mainWindow->y(), 
 								width*2, 
@@ -131,6 +200,36 @@ int ImpressionistDoc::loadImage(char *iname)
 	// refresh paint view as well
 	m_pUI->m_paintView->resizeWindow(width, height);	
 	m_pUI->m_paintView->refresh();
+
+
+	return 1;
+}
+
+//---------------------------------------------------------
+// Load the specified image
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::loadGrad(char *iname)
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width,height;
+
+	if ((data = readBMP(iname, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	// reflect the fact of loading the new image
+	m_nGradWidth = width;
+	m_nGradHeight = height;
+
+	// release old storage
+	if (m_ucGradient) delete[] m_ucGradient;
+
+	m_ucGradient = data;
 
 
 	return 1;
@@ -199,4 +298,38 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
 }
+
+//------------------------------------------------------------------
+// Get pixel of the grad iamge
+//------------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetGradPixel(int x, int y)
+{
+	if (x%m_nGradWidth== (m_nGradWidth - 1)||x%m_nGradWidth==0)
+		x = 1;
+	else x = x%m_nGradWidth;
+
+	if (y%m_nGradHeight==(m_nGradHeight - 1)||y%m_nGradHeight==0)
+		y = 1;
+	else y = y%m_nGradHeight;
+
+	return (GLubyte*)(m_ucGradient + 3 * (y*m_nGradWidth + x));
+}
+
+//----------------------------------------------------------------
+// Get pixel of the grad iamge
+//----------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetGradPixel(const Point p)
+{
+	return GetGradPixel(p.x, p.y);
+}
+
+/*void ImpressionistDoc::swapOriginPaint() {
+	unsigned char* temp = NULL;
+	temp = m_ucBitmap;
+	m_ucBitmap = m_ucPainting;
+	m_ucPainting = temp;
+	m_pUI->m_origView->refresh();
+	printf("1");
+	m_pUI->m_paintView->refresh();
+}*/
 

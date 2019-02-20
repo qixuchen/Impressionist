@@ -185,6 +185,20 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 
 
 //------------------------------------------------------------------
+// load gradient image
+//------------------------------------------------------------------
+void ImpressionistUI::cb_load_grad(Fl_Menu_* o, void* v)
+{
+	ImpressionistDoc *pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadGrad(newfile);
+	}
+	whoami(o)->AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].activate();
+}
+
+//------------------------------------------------------------------
 // Brings up a file chooser and then saves the painted image
 // This is called by the UI when the save image menu item is chosen
 //------------------------------------------------------------------
@@ -206,6 +220,15 @@ void ImpressionistUI::cb_save_image(Fl_Menu_* o, void* v)
 void ImpressionistUI::cb_brushes(Fl_Menu_* o, void* v) 
 {
 	whoami(o)->m_brushDialog->show();
+}
+
+
+//-------------------------------------------------------------
+// Brings up the color dialog
+//-------------------------------------------------------------
+void ImpressionistUI::cb_Color(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_colorDialog->show();
 }
 
 //------------------------------------------------------------
@@ -230,7 +253,21 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 
 }
 
+//-----------------------------------------------------------
+// BELL: Undo
+//-----------------------------------------------------------
+void ImpressionistUI::cb_undo(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_paintView->Undo();
+}
 
+//-----------------------------------------------------------
+// BELL: Swap
+//-----------------------------------------------------------
+void ImpressionistUI::cb_swap(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_paintView->SwapOrgPnt();
+}
 
 //-----------------------------------------------------------
 // Brings up an about dialog box
@@ -258,6 +295,19 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 	pDoc->setBrushType(type);
 }
 
+
+
+void ImpressionistUI::cb_angleChoice(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	int type = (int)v;
+
+
+	pDoc->setAngleType(type);
+}
+
 //------------------------------------------------------------
 // Clears the paintview canvas.
 // Called by the UI when the clear canvas button is pushed
@@ -279,6 +329,61 @@ void ImpressionistUI::cb_sizeSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nSize=int( ((Fl_Slider *)o)->value() ) ;
 }
+
+
+//-----------------------------------------------------------
+// Updates the brush width
+// Called by the UI when the width slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_widthSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nWidth = int(((Fl_Slider *)o)->value());
+}
+
+
+//-----------------------------------------------------------
+// Updates the brush angle
+// Called by the UI when the angle slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_angleSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nAngle = int(((Fl_Slider *)o)->value());
+}
+
+
+//-----------------------------------------------------------
+// Updates the brush alpha
+// Called by the UI when the alpha slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nAlpha = float(((Fl_Slider *)o)->value());
+}
+
+
+
+//-----------------------------------------------------------
+// Updates the red slide
+// the following two updates the green and blue slides
+//-----------------------------------------------------------
+void ImpressionistUI::cb_redSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nRed = int(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
+void ImpressionistUI::cb_greenSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nGreen = int(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
+void ImpressionistUI::cb_blueSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nBlue = int(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
 
 //---------------------------------- per instance functions --------------------------------------
 
@@ -339,6 +444,86 @@ void ImpressionistUI::setSize( int size )
 		m_BrushSizeSlider->value(m_nSize);
 }
 
+
+
+//------------------------------------------------
+// Return the brush width
+//------------------------------------------------
+int ImpressionistUI::getWidth()
+{
+	return m_nWidth;
+}
+
+//-------------------------------------------------
+// Set the brush width
+//-------------------------------------------------
+void ImpressionistUI::setWidth(int width)
+{
+	m_nWidth = width;
+
+	if (width <= 40)
+		m_BrushWidthSlider->value(m_nWidth);
+}
+
+//------------------------------------------------
+// Return the brush angle
+//------------------------------------------------
+int ImpressionistUI::getAngle()
+{
+	return m_nAngle;
+}
+
+//-------------------------------------------------
+// Set the brush angle
+//-------------------------------------------------
+void ImpressionistUI::setAngle(int angle)
+{
+	m_nAngle = angle;
+
+	if (angle <= 359)
+		m_BrushAngleSlider->value(m_nAngle);
+}
+
+//------------------------------------------------
+// Return the brush alpha
+//------------------------------------------------
+float ImpressionistUI::getAlpha()
+{
+	return m_nAlpha;
+}
+
+//-------------------------------------------------
+// Set the brush alpha
+//-------------------------------------------------
+void ImpressionistUI::setAlpha(float alpha)
+{
+	m_nAlpha = alpha;
+
+	if (alpha <= 1.0)
+		m_BrushAlphaSlider->value(m_nAlpha);
+}
+
+
+bool ImpressionistUI::getColorControlMode()
+{
+	return m_nManualColorControl;
+}
+
+//------------------------------------------------
+// Return R G B
+//------------------------------------------------
+int ImpressionistUI::getRed()
+{
+	return m_nRed;
+}
+int ImpressionistUI::getGreen()
+{
+	return m_nGreen;
+}
+int ImpressionistUI::getBlue()
+{
+	return m_nBlue;
+}
 // Main menu definition
 Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -346,10 +531,15 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_save_image },
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes }, 
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
-		
+		{ "&Color",	FL_ALT + 'o', (Fl_Callback *)ImpressionistUI::cb_Color },
+		{ "&Import Gradient Image",	FL_ALT + 'i', (Fl_Callback *)ImpressionistUI::cb_load_grad },
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
 
+	{ "&Option",		0, 0, 0, FL_SUBMENU },
+		{ "&Undo",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_undo },
+		{ "&Swap",	FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_swap },
+		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
 		{ "&About",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_about },
 		{ 0 },
@@ -367,6 +557,17 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
   {0}
 };
+
+
+// Angle control menu definition
+Fl_Menu_Item ImpressionistUI::AngleTypeMenu[] = {
+  {"Slider/Right Mouse",		FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)SLIDER_RIGHT_MOUSE},
+  {"Gradient",					FL_ALT + 'l', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)GRADIENT},
+  {"Brush Direction",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)BRUSH_DIRECTION},
+  {"Follow Image",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)FOLLOW_ANOTHER_IMAGE},
+  {0}
+};
+
 
 
 
@@ -402,6 +603,11 @@ ImpressionistUI::ImpressionistUI() {
 	// init values
 
 	m_nSize = 10;
+	m_nWidth = 1;
+	m_nAngle = 0;
+	m_nAlpha = 1.0;
+	m_nRed = m_nGreen = m_nBlue = 0;
+	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -415,9 +621,15 @@ ImpressionistUI::ImpressionistUI() {
 		m_ClearCanvasButton->user_data((void*)(this));
 		m_ClearCanvasButton->callback(cb_clear_canvas_button);
 
+		m_AngleTypeChoice = new Fl_Choice(112, 50, 150, 25, "&Stroke Direction");
+		m_AngleTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_AngleTypeChoice->menu(AngleTypeMenu);
+		m_AngleTypeChoice->callback(cb_angleChoice);
+		m_AngleTypeChoice->deactivate();
+
 
 		// Add brush size slider to the dialog 
-		m_BrushSizeSlider = new Fl_Value_Slider(10, 80, 300, 20, "Size");
+		m_BrushSizeSlider = new Fl_Value_Slider(10, 120, 300, 20, "Size");
 		m_BrushSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_BrushSizeSlider->type(FL_HOR_NICE_SLIDER);
         m_BrushSizeSlider->labelfont(FL_COURIER);
@@ -429,6 +641,89 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushSizeSlider->align(FL_ALIGN_RIGHT);
 		m_BrushSizeSlider->callback(cb_sizeSlides);
 
+
+		// Add line width slider to the dialog 
+		m_BrushWidthSlider = new Fl_Value_Slider(10, 160, 300, 20, "Line Width");
+		m_BrushWidthSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_BrushWidthSlider->type(FL_HOR_NICE_SLIDER);
+		m_BrushWidthSlider->labelfont(FL_COURIER);
+		m_BrushWidthSlider->labelsize(12);
+		m_BrushWidthSlider->minimum(1);
+		m_BrushWidthSlider->maximum(40);
+		m_BrushWidthSlider->step(1);
+		m_BrushWidthSlider->value(m_nWidth);
+		m_BrushWidthSlider->align(FL_ALIGN_RIGHT);
+		m_BrushWidthSlider->callback(cb_widthSlides);
+		m_BrushWidthSlider->deactivate();
+
+
+		// Add brush angle slider to the dialog 
+		m_BrushAngleSlider = new Fl_Value_Slider(10, 200, 300, 20, "Line Angle");
+		m_BrushAngleSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_BrushAngleSlider->type(FL_HOR_NICE_SLIDER);
+		m_BrushAngleSlider->labelfont(FL_COURIER);
+		m_BrushAngleSlider->labelsize(12);
+		m_BrushAngleSlider->minimum(0);
+		m_BrushAngleSlider->maximum(359);
+		m_BrushAngleSlider->step(1);
+		m_BrushAngleSlider->value(m_nAngle);
+		m_BrushAngleSlider->align(FL_ALIGN_RIGHT);
+		m_BrushAngleSlider->callback(cb_angleSlides);
+		m_BrushAngleSlider->deactivate();
+
+		// Add brush alpha slider to the dialog 
+		m_BrushAlphaSlider = new Fl_Value_Slider(10, 240, 300, 20, "Alpha");
+		m_BrushAlphaSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_BrushAlphaSlider->type(FL_HOR_NICE_SLIDER);
+		m_BrushAlphaSlider->labelfont(FL_COURIER);
+		m_BrushAlphaSlider->labelsize(12);
+		m_BrushAlphaSlider->minimum(0.0);
+		m_BrushAlphaSlider->maximum(1.0);
+		m_BrushAlphaSlider->step(0.01);
+		m_BrushAlphaSlider->value(m_nAlpha);
+		m_BrushAlphaSlider->align(FL_ALIGN_RIGHT);
+		m_BrushAlphaSlider->callback(cb_alphaSlides);
+
     m_brushDialog->end();	
+
+	//for color control
+	m_colorDialog = new Fl_Window(200, 200, "Color");
+		m_redSlider = new Fl_Value_Slider(10, 50, 150, 20, "Red");
+		m_redSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_redSlider->type(FL_HOR_NICE_SLIDER);
+		m_redSlider->labelfont(FL_COURIER);
+		m_redSlider->labelsize(12);
+		m_redSlider->minimum(0);
+		m_redSlider->maximum(255);
+		m_redSlider->step(1);
+		m_redSlider->value(m_nRed);
+		m_redSlider->align(FL_ALIGN_RIGHT);
+		m_redSlider->callback(cb_redSlides);
+
+		m_greenSlider = new Fl_Value_Slider(10, 90, 150, 20, "Green");
+		m_greenSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_greenSlider->type(FL_HOR_NICE_SLIDER);
+		m_greenSlider->labelfont(FL_COURIER);
+		m_greenSlider->labelsize(12);
+		m_greenSlider->minimum(0);
+		m_greenSlider->maximum(255);
+		m_greenSlider->step(1);
+		m_greenSlider->value(m_nGreen);
+		m_greenSlider->align(FL_ALIGN_RIGHT);
+		m_greenSlider->callback(cb_greenSlides);
+
+		m_blueSlider = new Fl_Value_Slider(10, 130, 150, 20, "Blue");
+		m_blueSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_blueSlider->type(FL_HOR_NICE_SLIDER);
+		m_blueSlider->labelfont(FL_COURIER);
+		m_blueSlider->labelsize(12);
+		m_blueSlider->minimum(0);
+		m_blueSlider->maximum(255);
+		m_blueSlider->step(1);
+		m_blueSlider->value(m_nBlue);
+		m_blueSlider->align(FL_ALIGN_RIGHT);
+		m_blueSlider->callback(cb_blueSlides);
+
+	m_colorDialog->end();
 
 }

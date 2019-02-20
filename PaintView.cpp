@@ -9,6 +9,7 @@
 #include "impressionistUI.h"
 #include "paintview.h"
 #include "ImpBrush.h"
+#include <math.h>
 
 
 #define LEFT_MOUSE_DOWN		1
@@ -27,6 +28,9 @@
 static int		eventToDo;
 static int		isAnEvent=0;
 static Point	coord;
+static Point    grad_start(0,0);
+static Point    grad_end(0,0);
+
 
 PaintView::PaintView(int			x, 
 					 int			y, 
@@ -37,6 +41,7 @@ PaintView::PaintView(int			x,
 {
 	m_nWindowWidth	= w;
 	m_nWindowHeight	= h;
+
 
 }
 
@@ -98,31 +103,71 @@ void PaintView::draw()
 		// Clear it after processing.
 		isAnEvent	= 0;	
 
+		//BELL: clip brush stroke
+
+		if (coord.x < 0) {
+			coord.x = 0;
+		}
+		else if (coord.x > m_nDrawWidth) {
+			coord.x = m_nDrawWidth;
+		}
+		if (coord.y < 0) {
+			coord.y = 0;
+		}
+		else if (coord.y > m_nDrawHeight) {
+			coord.y = m_nDrawHeight;
+		}
+		//BELL: clip brush stroke
+
 		Point source( coord.x + m_nStartCol, m_nEndRow - coord.y );
 		Point target( coord.x, m_nWindowHeight - coord.y );
+
 		
 		// This is the event handler
 		switch (eventToDo) 
 		{
 		case LEFT_MOUSE_DOWN:
+
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			break;
 		case LEFT_MOUSE_DRAG:
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
 			break;
 		case LEFT_MOUSE_UP:
+
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
 
 			SaveCurrentContent();
 			RestoreContent();
 			break;
 		case RIGHT_MOUSE_DOWN:
-
+			if (strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Lines") && strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Scattered Lines"))break;
+			if (m_pDoc->m_nAngleType != ImpressionistUI::SLIDER_RIGHT_MOUSE)break;
+			grad_start.x = coord.x;
+			grad_start.y = m_nWindowHeight - coord.y;
 			break;
 		case RIGHT_MOUSE_DRAG:
+			if (strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Lines") && strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Scattered Lines"))break;
+			if (m_pDoc->m_nAngleType != ImpressionistUI::SLIDER_RIGHT_MOUSE)break;
 
+			RestoreContent();
+			grad_end.x = coord.x;
+			grad_end.y = m_nWindowHeight - coord.y;
+			glBegin(GL_LINES);
+			glColor3f(1.0, 0.0, 0.0);
+			glVertex2d(grad_start.x, grad_start.y);
+			glVertex2d(grad_end.x, grad_end.y);
+			glEnd();
 			break;
 		case RIGHT_MOUSE_UP:
+			if (strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Lines") && strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Scattered Lines"))break;
+			if (m_pDoc->m_nAngleType != ImpressionistUI::SLIDER_RIGHT_MOUSE)break;
+
+			RestoreContent();
+			grad_end.x = coord.x;
+			grad_end.y = m_nWindowHeight - coord.y;
+			m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180)+180);
+			m_pDoc->setSize((int)sqrt(pow((grad_end.x - grad_start.x), 2) + pow((grad_end.y - grad_start.y), 2)));
 
 			break;
 
@@ -131,6 +176,8 @@ void PaintView::draw()
 			break;
 		}
 	}
+
+
 
 	glFlush();
 
@@ -182,14 +229,13 @@ int PaintView::handle(int event)
 	case FL_MOVE:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
+
 		break;
 	default:
 		return 0;
 		break;
 
 	}
-
-
 
 	return 1;
 }
@@ -208,6 +254,8 @@ void PaintView::SaveCurrentContent()
 {
 	// Tell openGL to read from the front buffer when capturing
 	// out paint strokes
+	memcpy(m_pDoc->m_ucsave, m_pDoc->m_ucPainting, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight*3);
+
 	glReadBuffer(GL_FRONT);
 
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
@@ -239,4 +287,26 @@ void PaintView::RestoreContent()
 				  m_pPaintBitstart);
 
 //	glDrawBuffer(GL_FRONT);
+}
+
+//BELL : UNDO
+void PaintView::Undo() {
+	memcpy( m_pDoc->m_ucPainting, m_pDoc->m_ucsave, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight*3);
+	glDrawBuffer(GL_FRONT_AND_BACK);
+	redraw();
+	glFlush();
+
+}
+
+
+//BELL: Swap originView and PaintView 
+void PaintView::SwapOrgPnt() {
+	unsigned char* temp;
+	temp = m_pDoc->m_ucPainting;
+	m_pDoc->m_ucPainting = m_pDoc->m_ucBitmap;
+	m_pDoc->m_ucBitmap = temp;
+	redraw();
+	m_pDoc->m_pUI->m_origView->redraw();
+	glFlush();
+
 }
