@@ -32,6 +32,8 @@ public:
 
 	void Undo();
 
+	void SwapOrgPnt();
+
 	ImpressionistDoc *m_pDoc;
 
 private:

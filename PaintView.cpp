@@ -297,3 +297,16 @@ void PaintView::Undo() {
 	glFlush();
 
 }
+
+
+//BELL: Swap originView and PaintView 
+void PaintView::SwapOrgPnt() {
+	unsigned char* temp;
+	temp = m_pDoc->m_ucPainting;
+	m_pDoc->m_ucPainting = m_pDoc->m_ucBitmap;
+	m_pDoc->m_ucBitmap = temp;
+	redraw();
+	m_pDoc->m_pUI->m_origView->redraw();
+	glFlush();
+
+}

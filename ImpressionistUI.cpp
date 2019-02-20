@@ -240,12 +240,19 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 }
 
 //-----------------------------------------------------------
-// Brings up an about dialog box
-// Called by the UI when the about menu item is chosen
+// BELL: Undo
 //-----------------------------------------------------------
 void ImpressionistUI::cb_undo(Fl_Menu_* o, void* v)
 {
 	whoami(o)->m_paintView->Undo();
+}
+
+//-----------------------------------------------------------
+// BELL: Swap
+//-----------------------------------------------------------
+void ImpressionistUI::cb_swap(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_paintView->SwapOrgPnt();
 }
 
 //-----------------------------------------------------------
@@ -516,6 +523,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 
 	{ "&Option",		0, 0, 0, FL_SUBMENU },
 		{ "&Undo",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_undo },
+		{ "&Swap",	FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_swap },
 		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
 		{ "&About",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_about },
