@@ -20,7 +20,7 @@ public:
 	void drawLine(int size, int width, float angle, const Point source, const Point target);
 	void setGradient(Point source);
 	char* BrushName(void);
-private:
+protected:
 	//these two point are used to catch the motion of mouse
 	//used if angle control is mouse movement
 	Point prev;

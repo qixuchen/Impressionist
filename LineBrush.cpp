@@ -83,6 +83,9 @@ void LineBrush::drawLine(int size,int width, float angle, const Point source, co
 	glEnd();
 }
 
+
+
+//this function is used to compute gradient and use it to set the angle of line brush
 void LineBrush::setGradient(Point source) {
 	ImpressionistDoc* pDoc = GetDocument();
 

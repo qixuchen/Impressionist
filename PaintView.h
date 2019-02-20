@@ -30,6 +30,8 @@ public:
 
 	void RestoreContent();
 
+	void Undo();
+
 	ImpressionistDoc *m_pDoc;
 
 private:

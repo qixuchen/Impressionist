@@ -1,6 +1,7 @@
 #include "ScatterLineBrush.h"
 #include "impressionistUI.h"
 #include "impressionistDoc.h"
+#include <math.h>
 
 
 extern float frand();
@@ -19,6 +20,23 @@ void ScatterLineBrush::BrushMove(const Point source, const Point target)
 		printf("PointBrush::BrushMove  document is NULL\n");
 		return;
 	}
+
+	//if angle control is mouse movement
+	if (pDoc->m_nAngleType == ImpressionistUI::BRUSH_DIRECTION) {
+		cur.x = target.x;
+		cur.y = target.y;
+		if (cur.x != prev.x || cur.y != prev.y) {
+			pDoc->setAngle((int)(atan(1.0*(cur.y - prev.y) / (1.0*(cur.x - prev.x))) / M_PI * 180) + 180);
+		}
+		prev.x = cur.x;
+		prev.y = cur.y;
+	}
+	else if (pDoc->m_nAngleType == ImpressionistUI::GRADIENT) { // when angle control is the gradient
+		setGradient(source);
+
+	}
+
+
 
 	int size = pDoc->getSize();
 	int width = pDoc->getWidth();

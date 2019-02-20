@@ -36,6 +36,8 @@ public:
 
 // for brush dialog
 	Fl_Window*			m_brushDialog;
+	Fl_Window*			m_colorDialog;
+
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_AngleTypeChoice;
 
@@ -51,6 +53,13 @@ public:
 	Fl_Slider*			m_BrushAngleSlider;
 	Fl_Slider*			m_BrushAlphaSlider;
 	Fl_Button*          m_ClearCanvasButton;
+
+	//color control
+	Fl_Slider*			m_redSlider;
+	Fl_Slider*			m_greenSlider;
+	Fl_Slider*			m_blueSlider;
+
+
 
 	// Member functions
 	void				setDocument(ImpressionistDoc* doc);
@@ -72,6 +81,13 @@ public:
 
 	float               getAlpha();
 	void                setAlpha(float alpha);
+
+	int					getRed();
+	int					getGreen();
+	int					getBlue();
+
+	bool				getColorControlMode();
+
 	
 	private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
@@ -81,6 +97,15 @@ public:
 	int     m_nWidth;
 	int     m_nAngle;
 	float     m_nAlpha;
+
+	int m_nRed, m_nGreen, m_nBlue;
+
+
+	// This value will be true if the color is determined using color panel. 
+	bool m_nManualColorControl = false;
+
+
+
 	// Static class members
 	static Fl_Menu_Item		menuitems[];
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
@@ -94,7 +119,9 @@ public:
 	static void	cb_save_image(Fl_Menu_* o, void* v);
 	static void	cb_brushes(Fl_Menu_* o, void* v);
 	static void	cb_clear_canvas(Fl_Menu_* o, void* v);
+	static void	cb_Color(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
+	static void	cb_undo(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void cb_angleChoice(Fl_Widget* o, void* v);
@@ -103,6 +130,9 @@ public:
 	static void	cb_widthSlides(Fl_Widget* o, void* v);
 	static void	cb_angleSlides(Fl_Widget* o, void* v);
 	static void	cb_alphaSlides(Fl_Widget* o, void* v);
+	static void	cb_redSlides(Fl_Widget* o, void* v);
+	static void	cb_greenSlides(Fl_Widget* o, void* v);
+	static void	cb_blueSlides(Fl_Widget* o, void* v);
 
 };
 

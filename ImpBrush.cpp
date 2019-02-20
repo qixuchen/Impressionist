@@ -51,5 +51,13 @@ void ImpBrush::SetColor (const Point source)
 
 	memcpy ( color, pDoc->GetOriginalPixel( source ), 3 );
 	
-	glColor4f((GLfloat)color[0]/255, (GLfloat)color[1] / 255, (GLfloat)color[2] / 255,pDoc->getAlpha());
+	if (pDoc->m_pUI->getColorControlMode() == false) {
+		glColor4f((GLfloat)color[0] / 255, (GLfloat)color[1] / 255, (GLfloat)color[2] / 255, pDoc->getAlpha());
+	}
+	else {
+		int red = pDoc->m_pUI->getRed();
+		int green = pDoc->m_pUI->getGreen();
+		int blue= pDoc->m_pUI->getBlue();
+		glColor4f(((GLfloat)color[0]*0.3+(GLfloat)red*0.7)/ 255, ((GLfloat)color[1] * 0.3 + (GLfloat)green*0.7) / 255, ((GLfloat)color[2] * 0.3 + (GLfloat)blue*0.7) / 255, pDoc->getAlpha());
+	}
 }

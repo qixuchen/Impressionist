@@ -127,12 +127,14 @@ void PaintView::draw()
 		switch (eventToDo) 
 		{
 		case LEFT_MOUSE_DOWN:
+
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			break;
 		case LEFT_MOUSE_DRAG:
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
 			break;
 		case LEFT_MOUSE_UP:
+
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
 
 			SaveCurrentContent();
@@ -166,6 +168,7 @@ void PaintView::draw()
 			grad_end.y = m_nWindowHeight - coord.y;
 			m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180)+180);
 			m_pDoc->setSize((int)sqrt(pow((grad_end.x - grad_start.x), 2) + pow((grad_end.y - grad_start.y), 2)));
+
 			break;
 
 		default:
@@ -173,6 +176,8 @@ void PaintView::draw()
 			break;
 		}
 	}
+
+
 
 	glFlush();
 
@@ -249,6 +254,8 @@ void PaintView::SaveCurrentContent()
 {
 	// Tell openGL to read from the front buffer when capturing
 	// out paint strokes
+	memcpy(m_pDoc->m_ucsave, m_pDoc->m_ucPainting, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight*3);
+
 	glReadBuffer(GL_FRONT);
 
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
@@ -280,4 +287,13 @@ void PaintView::RestoreContent()
 				  m_pPaintBitstart);
 
 //	glDrawBuffer(GL_FRONT);
+}
+
+//BELL : UNDO
+void PaintView::Undo() {
+	memcpy( m_pDoc->m_ucPainting, m_pDoc->m_ucsave, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight*3);
+	glDrawBuffer(GL_FRONT_AND_BACK);
+	redraw();
+	glFlush();
+
 }

@@ -208,6 +208,15 @@ void ImpressionistUI::cb_brushes(Fl_Menu_* o, void* v)
 	whoami(o)->m_brushDialog->show();
 }
 
+
+//-------------------------------------------------------------
+// Brings up the color dialog
+//-------------------------------------------------------------
+void ImpressionistUI::cb_Color(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_colorDialog->show();
+}
+
 //------------------------------------------------------------
 // Clears the paintview canvas.
 // Called by the UI when the clear canvas menu item is chosen
@@ -230,7 +239,14 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 
 }
 
-
+//-----------------------------------------------------------
+// Brings up an about dialog box
+// Called by the UI when the about menu item is chosen
+//-----------------------------------------------------------
+void ImpressionistUI::cb_undo(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_paintView->Undo();
+}
 
 //-----------------------------------------------------------
 // Brings up an about dialog box
@@ -322,6 +338,31 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nAlpha = float(((Fl_Slider *)o)->value());
 }
+
+
+
+//-----------------------------------------------------------
+// Updates the red slide
+// the following two updates the green and blue slides
+//-----------------------------------------------------------
+void ImpressionistUI::cb_redSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nRed = int(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
+void ImpressionistUI::cb_greenSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nGreen = int(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
+void ImpressionistUI::cb_blueSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nBlue = int(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
 
 //---------------------------------- per instance functions --------------------------------------
 
@@ -442,6 +483,26 @@ void ImpressionistUI::setAlpha(float alpha)
 }
 
 
+bool ImpressionistUI::getColorControlMode()
+{
+	return m_nManualColorControl;
+}
+
+//------------------------------------------------
+// Return R G B
+//------------------------------------------------
+int ImpressionistUI::getRed()
+{
+	return m_nRed;
+}
+int ImpressionistUI::getGreen()
+{
+	return m_nGreen;
+}
+int ImpressionistUI::getBlue()
+{
+	return m_nBlue;
+}
 // Main menu definition
 Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -449,10 +510,13 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_save_image },
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes }, 
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
-		
+		{ "&Color",	FL_ALT + 'o', (Fl_Callback *)ImpressionistUI::cb_Color },
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
 
+	{ "&Option",		0, 0, 0, FL_SUBMENU },
+		{ "&Undo",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_undo },
+		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
 		{ "&About",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_about },
 		{ 0 },
@@ -519,6 +583,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nWidth = 1;
 	m_nAngle = 0;
 	m_nAlpha = 1.0;
+	m_nRed = m_nGreen = m_nBlue = 0;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -596,5 +661,45 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushAlphaSlider->callback(cb_alphaSlides);
 
     m_brushDialog->end();	
+
+	//for color control
+	m_colorDialog = new Fl_Window(200, 200, "Color");
+		m_redSlider = new Fl_Value_Slider(10, 50, 150, 20, "Red");
+		m_redSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_redSlider->type(FL_HOR_NICE_SLIDER);
+		m_redSlider->labelfont(FL_COURIER);
+		m_redSlider->labelsize(12);
+		m_redSlider->minimum(0);
+		m_redSlider->maximum(255);
+		m_redSlider->step(1);
+		m_redSlider->value(m_nRed);
+		m_redSlider->align(FL_ALIGN_RIGHT);
+		m_redSlider->callback(cb_redSlides);
+
+		m_greenSlider = new Fl_Value_Slider(10, 90, 150, 20, "Green");
+		m_greenSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_greenSlider->type(FL_HOR_NICE_SLIDER);
+		m_greenSlider->labelfont(FL_COURIER);
+		m_greenSlider->labelsize(12);
+		m_greenSlider->minimum(0);
+		m_greenSlider->maximum(255);
+		m_greenSlider->step(1);
+		m_greenSlider->value(m_nGreen);
+		m_greenSlider->align(FL_ALIGN_RIGHT);
+		m_greenSlider->callback(cb_greenSlides);
+
+		m_blueSlider = new Fl_Value_Slider(10, 130, 150, 20, "Blue");
+		m_blueSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_blueSlider->type(FL_HOR_NICE_SLIDER);
+		m_blueSlider->labelfont(FL_COURIER);
+		m_blueSlider->labelsize(12);
+		m_blueSlider->minimum(0);
+		m_blueSlider->maximum(255);
+		m_blueSlider->step(1);
+		m_blueSlider->value(m_nBlue);
+		m_blueSlider->align(FL_ALIGN_RIGHT);
+		m_blueSlider->callback(cb_blueSlides);
+
+	m_colorDialog->end();
 
 }
