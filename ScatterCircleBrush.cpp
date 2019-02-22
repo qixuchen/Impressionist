@@ -29,10 +29,12 @@ void ScatterCircleBrush::BrushMove(const Point source, const Point target) {
 	//draw the original circle
 	drawCircle((float)size, source, target);
 
+	// Change of implementation in terms of drawing area.
+	// Old implementation: hardcode: 10 * frand() - 5.
 	//draw two new circles
 	for (int i = 0; i < 2; i++) {
-		int x_shift = 10 * frand() - 5;
-		int y_shift = 10 * frand() - 5;
+		int x_shift = (int) (size * frand() - size / 2);
+		int y_shift = (int)(size * frand() - size / 2);
 		Point new_source(source.x + x_shift, source.y + y_shift);
 		Point new_target(target.x + x_shift, target.y + y_shift);
 		drawCircle(size, new_source, new_target);

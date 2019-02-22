@@ -158,6 +158,9 @@ float ImpressionistDoc::getAlpha()
 //---------------------------------------------------------
 int ImpressionistDoc::loadImage(char *iname) 
 {
+	// For whistle 3
+	this->m_pUI->m_origView->m_bImage = true;
+
 	// try to open the image to read
 	unsigned char*	data;
 	int				width, 

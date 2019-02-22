@@ -18,6 +18,7 @@
 #define RIGHT_MOUSE_DOWN	4
 #define RIGHT_MOUSE_DRAG	5
 #define RIGHT_MOUSE_UP		6
+#define MOUSE_MOVEMENT		7
 
 
 #ifndef WIN32
@@ -91,10 +92,21 @@ void PaintView::draw()
 	m_nStartCol		= scrollpos.x;
 	m_nEndCol		= m_nStartCol + drawWidth;
 
+	// Whistle 3
+	// Update the cursor movement.
+	if (m_bMove) {
+		Point target(coord.x, m_nWindowHeight - coord.y);
+		m_pDoc->m_pUI->m_origView->isAnEvent = 1;
+		m_pDoc->m_pUI->m_origView->refresh();
+
+		m_pDoc->m_pUI->m_origView->isAnEvent = 2;
+		m_pDoc->m_pUI->m_origView->target = target;
+		m_pDoc->m_pUI->m_origView->refresh();
+	}
+
 	if ( m_pDoc->m_ucPainting && !isAnEvent) 
 	{
 		RestoreContent();
-
 	}
 
 	if ( m_pDoc->m_ucPainting && isAnEvent) 
@@ -122,7 +134,12 @@ void PaintView::draw()
 		Point source( coord.x + m_nStartCol, m_nEndRow - coord.y );
 		Point target( coord.x, m_nWindowHeight - coord.y );
 
-		
+		// Whistle 3
+		// Use for the part RIGHT_MOUSE_UP
+		// Stupid compiler!
+		// Author: Arceus
+		int tempAngle;
+
 		// This is the event handler
 		switch (eventToDo) 
 		{
@@ -137,6 +154,7 @@ void PaintView::draw()
 
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
 
+			m_bSwap = false;
 			SaveCurrentContent();
 			RestoreContent();
 			break;
@@ -166,11 +184,35 @@ void PaintView::draw()
 			RestoreContent();
 			grad_end.x = coord.x;
 			grad_end.y = m_nWindowHeight - coord.y;
-			m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180)+180);
+			// Change of implementation.
+			// author: Arceus
+			tempAngle = (int) (atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180);
+
+			// Alter the angles according to the quadrant.
+			if ((grad_end.y < grad_start.y) && (tempAngle < 0)) {
+				tempAngle = 360 + tempAngle;
+			}
+			else if ((grad_end.y < grad_start.y) && (tempAngle > 0)) {
+				tempAngle = 180 + tempAngle;
+			}
+			else if ((grad_end.y > grad_start.y) && (tempAngle < 0)) {
+				tempAngle = 180 + tempAngle;
+			}
+			else if ((grad_end.x < grad_start.x) && (tempAngle == 0)) {
+				tempAngle = 180 + tempAngle;
+			}
+			m_pDoc->setAngle(tempAngle);
+			// Change ends here.
+
+			// The following two lines are codes before.
+
+			//m_pDoc->setAngle((int)(atan(1.0*(grad_end.y - grad_start.y) / (1.0*(grad_end.x - grad_start.x))) / M_PI * 180)+180);
 			m_pDoc->setSize((int)sqrt(pow((grad_end.x - grad_start.x), 2) + pow((grad_end.y - grad_start.y), 2)));
 
 			break;
 
+		//case MOUSE_MOVEMENT:
+		//	break;
 		default:
 			printf("Unknown event!!\n");		
 			break;
@@ -229,6 +271,10 @@ int PaintView::handle(int event)
 	case FL_MOVE:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
+		// Whistle 3
+		// Update the cursor movement.
+		m_bMove = true;
+		redraw();
 
 		break;
 	default:
@@ -291,17 +337,26 @@ void PaintView::RestoreContent()
 
 //BELL : UNDO
 void PaintView::Undo() {
-	memcpy( m_pDoc->m_ucPainting, m_pDoc->m_ucsave, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight*3);
-	glDrawBuffer(GL_FRONT_AND_BACK);
-	redraw();
-	glFlush();
 
+	// Add a boolean checking.
+	if (!m_bSwap) {
+		memcpy(m_pDoc->m_ucPainting, m_pDoc->m_ucsave, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight * 3);
+		glDrawBuffer(GL_FRONT_AND_BACK);
+		redraw();
+		glFlush();
+	}
 }
 
 
 //BELL: Swap originView and PaintView 
 void PaintView::SwapOrgPnt() {
 	unsigned char* temp;
+
+	// Add a boolean variable.
+	// If detailed explanation is needed, please ask me directly.
+	// Too lazy to write comments.
+	m_bSwap = true;
+
 	temp = m_pDoc->m_ucPainting;
 	m_pDoc->m_ucPainting = m_pDoc->m_ucBitmap;
 	m_pDoc->m_ucBitmap = temp;
