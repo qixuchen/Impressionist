@@ -40,6 +40,7 @@ public:
 
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_AngleTypeChoice;
+	Fl_Choice*			m_AutoTypeChoice;
 
 
 	enum anglemode{
@@ -49,11 +50,17 @@ public:
 		FOLLOW_ANOTHER_IMAGE
 	};
 
+	enum automode {
+		REGULAR = 0,
+		RANDOM
+	};
+
 	Fl_Slider*			m_BrushSizeSlider;
 	Fl_Slider*			m_BrushWidthSlider;
 	Fl_Slider*			m_BrushAngleSlider;
 	Fl_Slider*			m_BrushAlphaSlider;
 	Fl_Button*          m_ClearCanvasButton;
+	Fl_Button*          m_autoPaintButton;
 
 	//color control
 	Fl_Slider*			m_redSlider;
@@ -111,6 +118,7 @@ public:
 	static Fl_Menu_Item		menuitems[];
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
 	static Fl_Menu_Item     AngleTypeMenu[];
+	static Fl_Menu_Item     AutoTypeMenu[];
 
 	static ImpressionistUI*	whoami(Fl_Menu_* o);
 
@@ -136,6 +144,8 @@ public:
 	static void	cb_redSlides(Fl_Widget* o, void* v);
 	static void	cb_greenSlides(Fl_Widget* o, void* v);
 	static void	cb_blueSlides(Fl_Widget* o, void* v);
+	static void cb_auto_paint_button(Fl_Widget* o, void* v);
+	static void cb_autoChoice(Fl_Widget* o, void* v);
 
 };
 

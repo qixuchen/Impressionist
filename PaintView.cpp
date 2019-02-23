@@ -18,7 +18,7 @@
 #define RIGHT_MOUSE_DOWN	4
 #define RIGHT_MOUSE_DRAG	5
 #define RIGHT_MOUSE_UP		6
-#define MOUSE_MOVEMENT		7
+#define AUTO_DRAW			7
 
 
 #ifndef WIN32
@@ -42,8 +42,6 @@ PaintView::PaintView(int			x,
 {
 	m_nWindowWidth	= w;
 	m_nWindowHeight	= h;
-
-
 }
 
 
@@ -144,14 +142,12 @@ void PaintView::draw()
 		switch (eventToDo) 
 		{
 		case LEFT_MOUSE_DOWN:
-
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			break;
 		case LEFT_MOUSE_DRAG:
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
 			break;
 		case LEFT_MOUSE_UP:
-
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
 
 			m_bSwap = false;
@@ -211,8 +207,94 @@ void PaintView::draw()
 
 			break;
 
-		//case MOUSE_MOVEMENT:
-		//	break;
+		// 1.5 points extra credits.
+		case AUTO_DRAW:
+			// Draw.
+			if (m_pDoc->m_nAutoType == ImpressionistUI::automode::REGULAR) {
+				for (int i = 0; i < m_nDrawWidth; i += m_pDoc->getSize()) {
+					for (int j = 0; j < m_nDrawHeight; j += m_pDoc->getSize()) {
+						Point currentPoint(i, j);
+						source.x = currentPoint.x + m_nStartCol;
+						source.y = m_nEndRow - currentPoint.y;
+						target.x = currentPoint.x;
+						target.y = m_nWindowHeight - currentPoint.y;
+						if (i == 0 && j == 0) {
+							m_pDoc->m_pCurrentBrush->BrushBegin(source, target);
+						}
+						else if (i + m_pDoc->getSize() > m_nDrawWidth - 1 && j + m_pDoc->getSize() > m_nDrawHeight - 1) {
+							m_pDoc->m_pCurrentBrush->BrushEnd(source, target);
+							SaveCurrentContent();
+							RestoreContent();
+						}
+						else {
+							m_pDoc->m_pCurrentBrush->BrushMove(source, target);
+						}
+						glFlush();
+					}
+				}
+			}
+			// Random paint.
+			else {
+				int originalSize = m_pDoc->getSize();
+				int originalWidth = m_pDoc->getWidth();
+				int originalAngle = m_pDoc->getAngle();
+				int iterations = (int)((m_nDrawWidth / m_pDoc->getSize()) * (int)(m_nDrawHeight / m_pDoc->getSize()) * 1.5);
+				for (int i = 0; i < iterations; i++) {
+					int x = irand(m_nDrawWidth);
+					int y = irand(m_nDrawHeight);
+					Point currentPoint(x, y);
+					source.x = currentPoint.x + m_nStartCol;
+					source.y = m_nEndRow - currentPoint.y;
+					target.x = currentPoint.x;
+					target.y = m_nWindowHeight - currentPoint.y;
+					if (i == 0) {
+						m_pDoc->m_pCurrentBrush->BrushBegin(source, target);
+					}
+					else if (i == iterations - 1) {
+						m_pDoc->m_pCurrentBrush->BrushEnd(source, target);
+						SaveCurrentContent();
+						RestoreContent();
+					}
+					else {
+						m_pDoc->m_pCurrentBrush->BrushMove(source, target);
+					}
+					
+					// Randomly change size, angle, width.
+					int size = originalSize + (int)(6 * frand() - 3);
+					if (size < 3) {
+						size = 3;
+					}
+					m_pDoc->setSize(size);
+					
+					if (!(strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Lines") &&
+						strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Scattered Lines"))) {
+
+						// Change width.
+						
+						int width = originalWidth + (int)(4 * frand() - 2);
+						if (width < 1) {
+							width = 1;
+						}
+						m_pDoc->setWidth(width);
+
+						// Change angle.
+				
+						int angle = originalAngle + (int) (10 * frand() - 5);
+
+						if (angle > 359) {
+							angle = 359;
+						}
+						else if (angle < 0) {
+							angle = 0;
+						}
+						m_pDoc->setAngle(angle);
+					}
+
+					glFlush();
+				}
+			}
+			
+			break;
 		default:
 			printf("Unknown event!!\n");		
 			break;
@@ -227,45 +309,44 @@ void PaintView::draw()
 	// To avoid flicker on some machines.
 	glDrawBuffer(GL_BACK);
 	#endif // !MESA
-
 }
 
 
 int PaintView::handle(int event)
 {
-	switch(event)
+	switch (event)
 	{
 	case FL_ENTER:
-	    redraw();
+		redraw();
 		break;
 	case FL_PUSH:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
-		if (Fl::event_button()>1)
-			eventToDo=RIGHT_MOUSE_DOWN;
+		if (Fl::event_button() > 1)
+			eventToDo = RIGHT_MOUSE_DOWN;
 		else
-			eventToDo=LEFT_MOUSE_DOWN;
-		isAnEvent=1;
+			eventToDo = LEFT_MOUSE_DOWN;
+		isAnEvent = 1;
 		redraw();
 		break;
 	case FL_DRAG:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
-		if (Fl::event_button()>1)
-			eventToDo=RIGHT_MOUSE_DRAG;
+		if (Fl::event_button() > 1)
+			eventToDo = RIGHT_MOUSE_DRAG;
 		else
-			eventToDo=LEFT_MOUSE_DRAG;
-		isAnEvent=1;
+			eventToDo = LEFT_MOUSE_DRAG;
+		isAnEvent = 1;
 		redraw();
 		break;
 	case FL_RELEASE:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
-		if (Fl::event_button()>1)
-			eventToDo=RIGHT_MOUSE_UP;
+		if (Fl::event_button() > 1)
+			eventToDo = RIGHT_MOUSE_UP;
 		else
-			eventToDo=LEFT_MOUSE_UP;
-		isAnEvent=1;
+			eventToDo = LEFT_MOUSE_UP;
+		isAnEvent = 1;
 		redraw();
 		break;
 	case FL_MOVE:
@@ -364,4 +445,10 @@ void PaintView::SwapOrgPnt() {
 	m_pDoc->m_pUI->m_origView->redraw();
 	glFlush();
 
+}
+
+void PaintView::autoPaint() {
+	isAnEvent = 1;
+	eventToDo = AUTO_DRAW;
+	redraw();
 }

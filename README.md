@@ -4,4 +4,6 @@
 
 - 0.5 points: 2, 3, 4
 - 1 point: 1, 3
-- 1.5 points: 5
+- 1.5 points: 5, 4
+
+## Total extra credits till now: 6.5.

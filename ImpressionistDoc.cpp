@@ -34,6 +34,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucGradient = NULL;
 
 	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
+	m_nAutoType = ImpressionistUI::automode::REGULAR;
 
 
 	// create one instance of each brush
@@ -99,6 +100,11 @@ void ImpressionistDoc::setAngleType(int type)
 	m_nAngleType = type;
 }
 
+void ImpressionistDoc::setAutoType(int type)
+{
+	m_nAutoType = type;
+}
+
 
 //---------------------------------------------------------
 // Returns the size of the brush.
@@ -122,6 +128,11 @@ void ImpressionistDoc::setSize(int size) {
 int ImpressionistDoc::getWidth()
 {
 	return m_pUI->getWidth();
+}
+
+void ImpressionistDoc::setWidth(int width)
+{
+	m_pUI->setWidth(width);
 }
 
 //---------------------------------------------------------
@@ -336,3 +347,7 @@ GLubyte* ImpressionistDoc::GetGradPixel(const Point p)
 	m_pUI->m_paintView->refresh();
 }*/
 
+//
+void ImpressionistDoc::automaticPaint() {
+	m_pUI->m_paintView->autoPaint();
+}

@@ -304,8 +304,18 @@ void ImpressionistUI::cb_angleChoice(Fl_Widget* o, void* v)
 
 	int type = (int)v;
 
-
 	pDoc->setAngleType(type);
+}
+
+void ImpressionistUI::cb_autoChoice(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	int type = (int)v;
+
+
+	pDoc->setAutoType(type);
 }
 
 //------------------------------------------------------------
@@ -319,6 +329,13 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 	pDoc->clearCanvas();
 }
 
+// Self-explanatory
+void ImpressionistUI::cb_auto_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->automaticPaint();
+}
 
 //-----------------------------------------------------------
 // Updates the brush size to use from the value of the size
@@ -568,6 +585,13 @@ Fl_Menu_Item ImpressionistUI::AngleTypeMenu[] = {
   {0}
 };
 
+// Angle control menu definition
+Fl_Menu_Item ImpressionistUI::AutoTypeMenu[] = {
+  {"Sequential",		FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_autoChoice, (void *)REGULAR},
+  {"Random",					FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_autoChoice, (void *)RANDOM},
+  {0}
+};
+
 
 
 
@@ -683,6 +707,15 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushAlphaSlider->value(m_nAlpha);
 		m_BrushAlphaSlider->align(FL_ALIGN_RIGHT);
 		m_BrushAlphaSlider->callback(cb_alphaSlides);
+
+		m_autoPaintButton = new Fl_Button(10, 280, 150, 20, "&Auto Paint");
+		m_autoPaintButton->user_data((void*)(this));
+		m_autoPaintButton->callback(cb_auto_paint_button);
+
+		m_AutoTypeChoice = new Fl_Choice(220, 280, 150, 20, "Style");
+		m_AutoTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_AutoTypeChoice->menu(AutoTypeMenu);
+		m_AutoTypeChoice->callback(cb_autoChoice);
 
     m_brushDialog->end();	
 

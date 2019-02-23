@@ -39,6 +39,9 @@ public:
 	
 	void    swapOriginPaint();
 
+	void	automaticPaint();				
+	void	setAutoType(int type);
+
 // Attributes
 public:
 	// Dimensions of original window.
@@ -70,6 +73,9 @@ public:
 	int m_nAngleType;
 
 	ImpressionistUI*	m_pUI;
+
+	// The way to auto draw.
+	int m_nAutoType;
 
 // Operations
 public:

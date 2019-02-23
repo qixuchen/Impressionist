@@ -15,6 +15,10 @@
 
 class ImpressionistDoc;
 
+
+extern int irand(int max);
+extern float frand();
+
 class PaintView : public Fl_Gl_Window
 {
 public:
@@ -36,6 +40,9 @@ public:
 
 	ImpressionistDoc *m_pDoc;
 
+	void autoPaint();
+
+
 private:
 	GLvoid* m_pPaintBitstart;
 	int		m_nDrawWidth,
@@ -46,7 +53,7 @@ private:
 			m_nEndCol,
 			m_nWindowWidth, 
 			m_nWindowHeight;
-	bool	m_bSwap, 
+	bool	m_bSwap,
 			m_bMove;
 
 };
