@@ -42,6 +42,10 @@ public:
 
 	void autoPaint();
 
+	void loopPaint(int iIncrement, int jIncrement, bool diffCheck);
+
+	void multiResPaint();
+
 
 private:
 	GLvoid* m_pPaintBitstart;
@@ -54,7 +58,7 @@ private:
 			m_nWindowWidth, 
 			m_nWindowHeight;
 	bool	m_bSwap,
-			m_bMove;
+		m_bMove;
 
 };
 

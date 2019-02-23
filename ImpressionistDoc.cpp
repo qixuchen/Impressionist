@@ -305,12 +305,31 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( int x, int y )
 	return (GLubyte*)(m_ucBitmap + 3 * (y*m_nWidth + x));
 }
 
+GLubyte* ImpressionistDoc::GetPaintingPixel(int x, int y)
+{
+	if (x < 0)
+		x = 0;
+	else if (x >= m_nWidth)
+		x = m_nWidth - 1;
+
+	if (y < 0)
+		y = 0;
+	else if (y >= m_nHeight)
+		y = m_nHeight - 1;
+
+	return (GLubyte*)(m_ucPainting + 3 * (y*m_nWidth + x));
+}
 //----------------------------------------------------------------
 // Get the color of the pixel in the original image at point p
 //----------------------------------------------------------------
 GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
+}
+
+GLubyte* ImpressionistDoc::GetPaintingPixel(const Point p)
+{
+	return GetPaintingPixel(p.x, p.y);
 }
 
 //------------------------------------------------------------------
@@ -350,4 +369,8 @@ GLubyte* ImpressionistDoc::GetGradPixel(const Point p)
 //
 void ImpressionistDoc::automaticPaint() {
 	m_pUI->m_paintView->autoPaint();
+}
+
+void ImpressionistDoc::multiResPaint() {
+	m_pUI->m_paintView->multiResPaint();
 }

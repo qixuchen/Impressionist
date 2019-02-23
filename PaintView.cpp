@@ -19,6 +19,7 @@
 #define RIGHT_MOUSE_DRAG	5
 #define RIGHT_MOUSE_UP		6
 #define AUTO_DRAW			7
+#define MULTI_RES			8
 
 
 #ifndef WIN32
@@ -42,6 +43,7 @@ PaintView::PaintView(int			x,
 {
 	m_nWindowWidth	= w;
 	m_nWindowHeight	= h;
+	m_bSwap = false;
 }
 
 
@@ -210,28 +212,21 @@ void PaintView::draw()
 		// 1.5 points extra credits.
 		case AUTO_DRAW:
 			// Draw.
+			m_bSwap = false;
 			if (m_pDoc->m_nAutoType == ImpressionistUI::automode::REGULAR) {
-				for (int i = 0; i < m_nDrawWidth; i += m_pDoc->getSize()) {
-					for (int j = 0; j < m_nDrawHeight; j += m_pDoc->getSize()) {
-						Point currentPoint(i, j);
-						source.x = currentPoint.x + m_nStartCol;
-						source.y = m_nEndRow - currentPoint.y;
-						target.x = currentPoint.x;
-						target.y = m_nWindowHeight - currentPoint.y;
-						if (i == 0 && j == 0) {
-							m_pDoc->m_pCurrentBrush->BrushBegin(source, target);
-						}
-						else if (i + m_pDoc->getSize() > m_nDrawWidth - 1 && j + m_pDoc->getSize() > m_nDrawHeight - 1) {
-							m_pDoc->m_pCurrentBrush->BrushEnd(source, target);
-							SaveCurrentContent();
-							RestoreContent();
-						}
-						else {
-							m_pDoc->m_pCurrentBrush->BrushMove(source, target);
-						}
-						glFlush();
-					}
+				bool lastMove = false;
+				int iIncrement = m_pDoc->getSize() - 1;
+				int jIncrement = m_pDoc->getSize() - 1;
+				if (!strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Lines")) {
+					jIncrement = (int) (m_pDoc->getWidth() * 2);
+					iIncrement /= 2;
 				}
+				if (!strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Circles") || !strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Scattered Circles") 
+					|| !strcmp(m_pDoc->m_pCurrentBrush->BrushName(), "Scattered Lines")) {
+					iIncrement /= 2;
+					jIncrement /= 2;
+				}
+				loopPaint(iIncrement, jIncrement, false);
 			}
 			// Random paint.
 			else {
@@ -295,6 +290,32 @@ void PaintView::draw()
 			}
 			
 			break;
+
+		case MULTI_RES: {
+			m_bSwap = false;
+			
+			m_pDoc->setBrushType(BRUSH_POINTS);
+			int granularity = (m_nDrawHeight > m_nDrawWidth ? m_nDrawWidth : m_nDrawHeight) / 10;;
+			printf("Granu:%d\n", granularity);
+			m_pDoc->setSize(granularity);
+			int iIncrement = granularity;
+			int jIncrement = granularity;
+			loopPaint(iIncrement, jIncrement, false);
+
+			
+			while(granularity > 4) {
+				granularity /= 2;
+				m_pDoc->setSize(granularity);
+				printf("Granu:%d\n", granularity);
+				iIncrement = granularity;
+				jIncrement = granularity;
+				loopPaint(iIncrement, jIncrement, true);
+			}
+			
+			
+			break;
+		}
+
 		default:
 			printf("Unknown event!!\n");		
 			break;
@@ -382,7 +403,6 @@ void PaintView::SaveCurrentContent()
 	// Tell openGL to read from the front buffer when capturing
 	// out paint strokes
 	memcpy(m_pDoc->m_ucsave, m_pDoc->m_ucPainting, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight*3);
-
 	glReadBuffer(GL_FRONT);
 
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
@@ -413,7 +433,7 @@ void PaintView::RestoreContent()
 				  GL_UNSIGNED_BYTE, 
 				  m_pPaintBitstart);
 
-//	glDrawBuffer(GL_FRONT);
+	glDrawBuffer(GL_FRONT_AND_BACK);
 }
 
 //BELL : UNDO
@@ -450,5 +470,43 @@ void PaintView::SwapOrgPnt() {
 void PaintView::autoPaint() {
 	isAnEvent = 1;
 	eventToDo = AUTO_DRAW;
+	redraw();
+}
+
+void PaintView::loopPaint(int iIncrement, int jIncrement, bool diffCheck) {
+	for (int i = (int)(-iIncrement); i < m_nDrawWidth + iIncrement; i += iIncrement) {
+		for (int j = (int)(-jIncrement); j < m_nDrawHeight + jIncrement; j += jIncrement) {
+			Point currentPoint(i, j);
+			Point source(0, 0), target(0, 0);
+			source.x = (currentPoint.x > m_nDrawWidth ? m_nDrawWidth : (currentPoint.x > 0 ? currentPoint.x : 0)) + m_nStartCol;
+			source.y = m_nEndRow - (currentPoint.y > m_nDrawHeight ? m_nDrawHeight : (currentPoint.y > 0 ? currentPoint.y : 0));
+			target.x = currentPoint.x;
+			target.y = m_nWindowHeight - currentPoint.y;
+			if (diffCheck) {
+				double diff = m_pDoc->m_pCurrentBrush->calDiff(source, target);
+				if (diff < 0.15) {
+					continue;
+				}
+			}
+			if (i == 0 && j == 0) {
+				m_pDoc->m_pCurrentBrush->BrushBegin(source, target);
+			}
+			else if (i + iIncrement > m_nDrawWidth + iIncrement - 1 && j + jIncrement > m_nDrawHeight + jIncrement - 1) {
+				m_pDoc->m_pCurrentBrush->BrushMove(source, target);
+				m_pDoc->m_pCurrentBrush->BrushEnd(source, target);
+			}
+			else {
+				m_pDoc->m_pCurrentBrush->BrushMove(source, target);
+			}
+			glFlush();
+		}
+	}
+	SaveCurrentContent();
+	RestoreContent();
+}
+
+void PaintView::multiResPaint() {
+	isAnEvent = 1;
+	eventToDo = MULTI_RES;
 	redraw();
 }

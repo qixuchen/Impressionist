@@ -8,6 +8,7 @@
 //
 
 #include <stdlib.h>
+#include <math.h>
 
 // Each brush type has an associated constant.
 enum
@@ -46,6 +47,9 @@ public:
 
 	// according to the source image and the position, determine the draw color
 	void SetColor( const Point source );
+
+	// Calculate the difference between two colors.
+	double calDiff(const Point source, const Point target);
 
 	// get Doc to communicate with it
 	ImpressionistDoc* GetDocument( void );

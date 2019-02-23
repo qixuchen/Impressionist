@@ -42,6 +42,8 @@ public:
 	void	automaticPaint();				
 	void	setAutoType(int type);
 
+	void	multiResPaint();
+
 // Attributes
 public:
 	// Dimensions of original window.
@@ -87,6 +89,9 @@ public:
 	GLubyte* GetGradPixel(int x, int y);
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetGradPixel(const Point p);
+
+	GLubyte* GetPaintingPixel(int x, int y);
+	GLubyte* GetPaintingPixel(const Point p);
 
 private:
 	char			m_imageName[256];

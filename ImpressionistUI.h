@@ -61,6 +61,7 @@ public:
 	Fl_Slider*			m_BrushAlphaSlider;
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button*          m_autoPaintButton;
+	Fl_Button*          m_multiResPaintButton;
 
 	//color control
 	Fl_Slider*			m_redSlider;
@@ -146,6 +147,7 @@ public:
 	static void	cb_blueSlides(Fl_Widget* o, void* v);
 	static void cb_auto_paint_button(Fl_Widget* o, void* v);
 	static void cb_autoChoice(Fl_Widget* o, void* v);
+	static void cb_multi_res_paint_button(Fl_Widget* o, void* v);
 
 };
 

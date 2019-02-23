@@ -337,6 +337,14 @@ void ImpressionistUI::cb_auto_paint_button(Fl_Widget* o, void* v)
 	pDoc->automaticPaint();
 }
 
+// Self-explanatory
+void ImpressionistUI::cb_multi_res_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->multiResPaint();
+}
+
 //-----------------------------------------------------------
 // Updates the brush size to use from the value of the size
 // slider
@@ -634,7 +642,7 @@ ImpressionistUI::ImpressionistUI() {
 	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
 
 	// brush dialog definition
-	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
+	m_brushDialog = new Fl_Window(400, 350, "Brush Dialog");
 		// Add a brush type choice to the dialog
 		m_BrushTypeChoice = new Fl_Choice(50,10,150,25,"&Brush");
 		m_BrushTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
@@ -716,6 +724,10 @@ ImpressionistUI::ImpressionistUI() {
 		m_AutoTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
 		m_AutoTypeChoice->menu(AutoTypeMenu);
 		m_AutoTypeChoice->callback(cb_autoChoice);
+
+		m_multiResPaintButton = new Fl_Button(10, 320, 150, 20, "&Multi Res Paint");
+		m_multiResPaintButton->user_data((void*)(this));
+		m_multiResPaintButton->callback(cb_multi_res_paint_button);
 
     m_brushDialog->end();	
 

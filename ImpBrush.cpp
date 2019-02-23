@@ -61,3 +61,16 @@ void ImpBrush::SetColor (const Point source)
 		glColor4f(((GLfloat)color[0]*0.3+(GLfloat)red*0.7)/ 255, ((GLfloat)color[1] * 0.3 + (GLfloat)green*0.7) / 255, ((GLfloat)color[2] * 0.3 + (GLfloat)blue*0.7) / 255, pDoc->getAlpha());
 	}
 }
+
+double ImpBrush::calDiff(const Point source, const Point target) {
+	ImpressionistDoc* pDoc = GetDocument();
+
+	GLubyte color1[3], color2[3];
+	memcpy(color1, pDoc->GetOriginalPixel(source), 3);
+	memcpy(color2, pDoc->GetPaintingPixel(source), 3);
+
+	double totalScore = sqrt(3) * 255;
+	double curScore = sqrt(pow(color1[0] - color2[0], 2) + pow(color1[1] - color2[1], 2)
+		+ pow(color1[2] - color2[2], 2));
+	return curScore / totalScore;
+}
