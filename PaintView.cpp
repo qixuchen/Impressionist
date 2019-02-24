@@ -294,9 +294,8 @@ void PaintView::draw()
 		case MULTI_RES: {
 			m_bSwap = false;
 			
-			m_pDoc->setBrushType(BRUSH_POINTS);
+			//m_pDoc->setBrushType(BRUSH_POINTS);
 			int granularity = (m_nDrawHeight > m_nDrawWidth ? m_nDrawWidth : m_nDrawHeight) / 10;;
-			printf("Granu:%d\n", granularity);
 			m_pDoc->setSize(granularity);
 			int iIncrement = granularity;
 			int jIncrement = granularity;
@@ -306,7 +305,6 @@ void PaintView::draw()
 			while(granularity > 4) {
 				granularity /= 2;
 				m_pDoc->setSize(granularity);
-				printf("Granu:%d\n", granularity);
 				iIncrement = granularity;
 				jIncrement = granularity;
 				loopPaint(iIncrement, jIncrement, true);
