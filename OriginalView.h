@@ -35,10 +35,30 @@ public:
 
 	ImpressionistDoc*	m_pDoc;
 
+	void SaveCurrentContent();
+
+	void RestoreContent();
+
+	void drawCursorMovement();
+
+	void showPoint();
+
+
+	int	isAnEvent;
+
+	Point target;
+
+	bool m_bImage; // Indicate whether a picture has been loaded or not.
+
 private:
 	int	m_nWindowWidth, 
 		m_nWindowHeight;
 
+	// Below are used for whistle 3.
+	int drawWidth, drawHeight;
+
+
+	GLvoid* bitstart; // Used for tracking cursor movement.
 };
 
 #endif

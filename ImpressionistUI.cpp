@@ -183,6 +183,16 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 	}
 }
 
+void ImpressionistUI::cb_load_mural_image(Fl_Menu_* o, void* v)
+{
+	ImpressionistDoc *pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadImage(newfile, true);
+	}
+}
+
 
 //------------------------------------------------------------------
 // load gradient image
@@ -304,8 +314,18 @@ void ImpressionistUI::cb_angleChoice(Fl_Widget* o, void* v)
 
 	int type = (int)v;
 
-
 	pDoc->setAngleType(type);
+}
+
+void ImpressionistUI::cb_autoChoice(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	int type = (int)v;
+
+
+	pDoc->setAutoType(type);
 }
 
 //------------------------------------------------------------
@@ -319,6 +339,29 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 	pDoc->clearCanvas();
 }
 
+// Self-explanatory
+void ImpressionistUI::cb_auto_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->automaticPaint();
+}
+
+// Self-explanatory
+void ImpressionistUI::cb_multi_res_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->multiResPaint();
+}
+
+// Self-explanatory
+void ImpressionistUI::cb_edge_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->edgePaint();
+}
 
 //-----------------------------------------------------------
 // Updates the brush size to use from the value of the size
@@ -360,6 +403,10 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_nAlpha = float(((Fl_Slider *)o)->value());
 }
 
+void ImpressionistUI::cb_edgeThresholdSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nEdgeThreshold = int(((Fl_Slider *)o)->value());
+}
 
 
 //-----------------------------------------------------------
@@ -454,6 +501,11 @@ int ImpressionistUI::getWidth()
 	return m_nWidth;
 }
 
+int ImpressionistUI::getEdgeThreshold()
+{
+	return m_nEdgeThreshold;
+}
+
 //-------------------------------------------------
 // Set the brush width
 //-------------------------------------------------
@@ -528,6 +580,7 @@ int ImpressionistUI::getBlue()
 Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Image...",	FL_ALT + 'l', (Fl_Callback *)ImpressionistUI::cb_load_image },
+		{ "&Add Mural Image...",	FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_load_mural_image },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_save_image },
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes }, 
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
@@ -555,6 +608,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Points",	FL_ALT+'q', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_POINTS},
   {"Scattered Lines",	FL_ALT+'m', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_LINES},
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
+  {"Curve Lines",	FL_ALT + 'f', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_CURVE_LINES},
   {0}
 };
 
@@ -565,6 +619,13 @@ Fl_Menu_Item ImpressionistUI::AngleTypeMenu[] = {
   {"Gradient",					FL_ALT + 'l', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)GRADIENT},
   {"Brush Direction",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)BRUSH_DIRECTION},
   {"Follow Image",			FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_angleChoice, (void *)FOLLOW_ANOTHER_IMAGE},
+  {0}
+};
+
+// Angle control menu definition
+Fl_Menu_Item ImpressionistUI::AutoTypeMenu[] = {
+  {"Sequential",		FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_autoChoice, (void *)REGULAR},
+  {"Random",					FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_autoChoice, (void *)RANDOM},
   {0}
 };
 
@@ -606,11 +667,12 @@ ImpressionistUI::ImpressionistUI() {
 	m_nWidth = 1;
 	m_nAngle = 0;
 	m_nAlpha = 1.0;
+	m_nEdgeThreshold = 5;
 	m_nRed = m_nGreen = m_nBlue = 0;
 	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
 
 	// brush dialog definition
-	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
+	m_brushDialog = new Fl_Window(400, 390, "Brush Dialog");
 		// Add a brush type choice to the dialog
 		m_BrushTypeChoice = new Fl_Choice(50,10,150,25,"&Brush");
 		m_BrushTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
@@ -683,6 +745,35 @@ ImpressionistUI::ImpressionistUI() {
 		m_BrushAlphaSlider->value(m_nAlpha);
 		m_BrushAlphaSlider->align(FL_ALIGN_RIGHT);
 		m_BrushAlphaSlider->callback(cb_alphaSlides);
+
+		m_autoPaintButton = new Fl_Button(10, 280, 150, 20, "&Auto Paint");
+		m_autoPaintButton->user_data((void*)(this));
+		m_autoPaintButton->callback(cb_auto_paint_button);
+
+		m_AutoTypeChoice = new Fl_Choice(220, 280, 150, 20, "Style");
+		m_AutoTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_AutoTypeChoice->menu(AutoTypeMenu);
+		m_AutoTypeChoice->callback(cb_autoChoice);
+
+		m_multiResPaintButton = new Fl_Button(10, 320, 150, 20, "&Multi Res Paint");
+		m_multiResPaintButton->user_data((void*)(this));
+		m_multiResPaintButton->callback(cb_multi_res_paint_button);
+
+		m_EdgeThresholdSlider = new Fl_Value_Slider(10, 360, 150, 20, "Edge");
+		m_EdgeThresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_EdgeThresholdSlider->type(FL_HOR_NICE_SLIDER);
+		m_EdgeThresholdSlider->labelfont(FL_COURIER);
+		m_EdgeThresholdSlider->labelsize(12);
+		m_EdgeThresholdSlider->minimum(1);
+		m_EdgeThresholdSlider->maximum(20);
+		m_EdgeThresholdSlider->step(1);
+		m_EdgeThresholdSlider->value(m_nEdgeThreshold);
+		m_EdgeThresholdSlider->align(FL_ALIGN_RIGHT);
+		m_EdgeThresholdSlider->callback(cb_edgeThresholdSlides);
+
+		m_edgePaintButton = new Fl_Button(220, 360, 150, 20, "&Edge Paint");
+		m_edgePaintButton->user_data((void*)(this));
+		m_edgePaintButton->callback(cb_edge_paint_button);
 
     m_brushDialog->end();	
 

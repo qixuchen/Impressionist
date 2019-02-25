@@ -19,6 +19,8 @@
 #include "ScatterPointBrush.h"
 #include "ScatterLineBrush.h"
 #include "ScatterCircleBrush.h"
+#include "CurveBrush.h"
+#include "EdgeBrush.h"
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -34,6 +36,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucGradient = NULL;
 
 	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
+	m_nAutoType = ImpressionistUI::automode::REGULAR;
 
 
 	// create one instance of each brush
@@ -53,6 +56,10 @@ ImpressionistDoc::ImpressionistDoc()
 		= new ScatterLineBrush( this, "Scattered Lines" );
 	ImpBrush::c_pBrushes[BRUSH_SCATTERED_CIRCLES]	
 		= new ScatterCircleBrush( this, "Scattered Circles" );
+	ImpBrush::c_pBrushes[BRUSH_CURVE_LINES]
+		= new CurveBrush(this, "Curve Lines");
+
+	m_pEdgeBrush = new EdgeBrush(this, "Edges");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
@@ -99,6 +106,11 @@ void ImpressionistDoc::setAngleType(int type)
 	m_nAngleType = type;
 }
 
+void ImpressionistDoc::setAutoType(int type)
+{
+	m_nAutoType = type;
+}
+
 
 //---------------------------------------------------------
 // Returns the size of the brush.
@@ -124,6 +136,15 @@ int ImpressionistDoc::getWidth()
 	return m_pUI->getWidth();
 }
 
+void ImpressionistDoc::setWidth(int width)
+{
+	m_pUI->setWidth(width);
+}
+
+int ImpressionistDoc::getEdgeThreshold()
+{
+	return m_pUI->getEdgeThreshold();
+}
 //---------------------------------------------------------
 // Returns the angle
 //---------------------------------------------------------
@@ -156,8 +177,15 @@ float ImpressionistDoc::getAlpha()
 // This is called by the UI when the load image button is 
 // pressed.
 //---------------------------------------------------------
-int ImpressionistDoc::loadImage(char *iname) 
+int ImpressionistDoc::loadImage(char *iname, bool mural) 
 {
+	if (this->m_pUI->m_origView->m_bImage == false && mural == true) {
+		//MessageBox("No base picture has been loaded!\n");
+		return 0;
+	}
+	// For whistle 3
+	this->m_pUI->m_origView->m_bImage = true;
+
 	// try to open the image to read
 	unsigned char*	data;
 	int				width, 
@@ -169,6 +197,14 @@ int ImpressionistDoc::loadImage(char *iname)
 		return 0;
 	}
 
+	// Backup previous params.
+	int prevWidth = -1;
+	int prevHeight = -1;
+	if (mural) {
+		prevWidth = m_nWidth;
+		prevHeight = m_nHeight;
+	}
+
 	// reflect the fact of loading the new image
 	m_nWidth		= width;
 	m_nPaintWidth	= width;
@@ -177,16 +213,40 @@ int ImpressionistDoc::loadImage(char *iname)
 
 	// release old storage
 	if ( m_ucBitmap ) delete [] m_ucBitmap;
-	if ( m_ucPainting ) delete [] m_ucPainting;
+
+	// Condition added for 1.5-point extra credit #2.
+	if(!mural)
+		if ( m_ucPainting ) delete [] m_ucPainting;
 
 	m_ucBitmap		= data;
 
 	// allocate space for draw view
-	m_ucPainting	= new unsigned char [width*height*3];
-	memset(m_ucPainting, 0, width*height*3);
+	if (!mural) {
+		m_ucPainting = new unsigned char[width*height * 3];
+		memset(m_ucPainting, 0, width*height * 3);
+		m_ucsave = new unsigned char[width*height * 3];
+		memset(m_ucsave, 0, width*height * 3);
+	}
+	// For the mural effect. Extra credit features.
+	else {
+		int realSize = (width*height * 3 < prevWidth * prevHeight * 3) ? width * height * 3 : prevWidth * prevHeight * 3;
 
-	m_ucsave = new unsigned char[width*height * 3];
-	memset(m_ucsave, 0, width*height*3);
+		unsigned char* temp1 = new unsigned char[width*height * 3];
+		memset(temp1, 0, width*height * 3);
+		for (int i = 0; i < (height < prevHeight ? height : prevHeight); i++) {
+			memcpy(temp1 + 3 * i * width, m_ucPainting + 3 * i * prevWidth, (width < prevWidth) ? 3 * width : 3 * prevWidth);
+		}
+		delete[] m_ucPainting;
+		m_ucPainting = temp1;
+
+		unsigned char* temp2 = new unsigned char[width*height * 3];
+		memset(temp2, 0, width*height * 3);
+		for (int i = 0; i < (height < prevHeight ? height : prevHeight); i++) {
+			memcpy(temp2 + 3 * i * width, m_ucsave + 3 * i * prevWidth, (width < prevWidth) ? 3 * width : 3 * prevWidth);
+		}
+		delete[] m_ucsave;
+		m_ucsave = temp2;
+	}
 
 	m_pUI->m_mainWindow->resize(m_pUI->m_mainWindow->x(), 
 								m_pUI->m_mainWindow->y(), 
@@ -291,12 +351,31 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( int x, int y )
 	return (GLubyte*)(m_ucBitmap + 3 * (y*m_nWidth + x));
 }
 
+GLubyte* ImpressionistDoc::GetPaintingPixel(int x, int y)
+{
+	if (x < 0)
+		x = 0;
+	else if (x >= m_nWidth)
+		x = m_nWidth - 1;
+
+	if (y < 0)
+		y = 0;
+	else if (y >= m_nHeight)
+		y = m_nHeight - 1;
+
+	return (GLubyte*)(m_ucPainting + 3 * (y*m_nWidth + x));
+}
 //----------------------------------------------------------------
 // Get the color of the pixel in the original image at point p
 //----------------------------------------------------------------
 GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
+}
+
+GLubyte* ImpressionistDoc::GetPaintingPixel(const Point p)
+{
+	return GetPaintingPixel(p.x, p.y);
 }
 
 //------------------------------------------------------------------
@@ -333,3 +412,15 @@ GLubyte* ImpressionistDoc::GetGradPixel(const Point p)
 	m_pUI->m_paintView->refresh();
 }*/
 
+//
+void ImpressionistDoc::automaticPaint() {
+	m_pUI->m_paintView->autoPaint();
+}
+
+void ImpressionistDoc::multiResPaint() {
+	m_pUI->m_paintView->multiResPaint();
+}
+
+void ImpressionistDoc::edgePaint() {
+	m_pUI->m_paintView->edgePaint();
+}

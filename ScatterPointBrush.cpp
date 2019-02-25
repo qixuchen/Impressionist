@@ -25,7 +25,11 @@ void ScatterPointBrush::BrushMove(const Point source, const Point target) {
 	//	(1 - current alpha in framebuffer) * shader's output color
 
 	int size = pDoc->getSize();
-	glPointSize((float)size);
+
+	// Hardcode size to be a rather small number.
+	glPointSize(1);
+	// Previous implementation.
+	//glPointSize((float)size);
 
 
 	//first brush
@@ -35,10 +39,13 @@ void ScatterPointBrush::BrushMove(const Point source, const Point target) {
 
 	glEnd();
 
+	// Change implementation here:
+	//		1. the area of drawing.
+	//		2. # of points.
 	//randomly generate two more brush
-	for (int i = 0; i < 2; i++) {
-		int x_shift = 10 * frand()-5;
-		int y_shift = 10 * frand()-5;
+	for (int i = 0; i < size * size / 5; i++) {
+		int x_shift = (int) (size * frand() - size / 2);
+		int y_shift = (int)(size * frand() - size / 2);
 		Point new_source(source.x + x_shift, source.y + y_shift);
 		glBegin(GL_POINTS);
 		SetColor(new_source);

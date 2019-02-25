@@ -19,7 +19,7 @@ public:
 
 	void	setUI(ImpressionistUI* ui);		// Assign the UI to use
 
-	int		loadImage(char *iname);			// called by the UI to load image
+	int		loadImage(char *iname, bool mural = false);			// called by the UI to load image
 	int		saveImage(char *iname);			// called by the UI to save image
 	int		loadGrad(char *iname);			// called by the UI to load  GRADIENT image
 
@@ -36,8 +36,18 @@ public:
 	float	getAlpha();						// get the brush alpha
 	void	setAlpha(float alpha);			// set the brush alpha
 	char*	getImageName();					// get the current image name
+
+	int     getEdgeThreshold();
 	
 	void    swapOriginPaint();
+
+
+	void	automaticPaint();				
+	void	setAutoType(int type); // sequentially or randomly.
+
+	void	multiResPaint();
+
+	void	edgePaint(); // Paint the edge picture.
 
 // Attributes
 public:
@@ -65,11 +75,15 @@ public:
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
+	ImpBrush*			m_pEdgeBrush;
 	// Size of the brush.
 	int m_nSize;
 	int m_nAngleType;
 
 	ImpressionistUI*	m_pUI;
+
+	// The way to auto draw.
+	int m_nAutoType; // two choices.
 
 // Operations
 public:
@@ -81,6 +95,9 @@ public:
 	GLubyte* GetGradPixel(int x, int y);
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetGradPixel(const Point p);
+
+	GLubyte* GetPaintingPixel(int x, int y);
+	GLubyte* GetPaintingPixel(const Point p);
 
 private:
 	char			m_imageName[256];

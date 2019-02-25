@@ -59,10 +59,13 @@ void ScatterLineBrush::BrushMove(const Point source, const Point target)
 	//first line
 	drawLine(size, width, angle, source, target);
 
-	//draw two more lines
-	for (int i = 0; i < 2; i++) {
-		int x_shift = 10 * frand() - 5;
-		int y_shift = 10 * frand() - 5;
+	//draw three more lines
+	for (int i = 0; i < 3; i++) {
+		// Change of range of drawing lines.
+		// Author: Arceus
+		// Previous: hardcoded: 10 * frand() - 5
+		int x_shift = (int) (size * frand() - size / 2);
+		int y_shift = (int) (size * frand() - size / 2);
 		Point new_source(source.x + x_shift, source.y + y_shift);
 		Point new_target(target.x + x_shift, target.y + y_shift);
 		drawLine(size, width, angle, new_source, new_target);
