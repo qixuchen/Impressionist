@@ -36,13 +36,18 @@ public:
 	float	getAlpha();						// get the brush alpha
 	void	setAlpha(float alpha);			// set the brush alpha
 	char*	getImageName();					// get the current image name
+
+	int     getEdgeThreshold();
 	
 	void    swapOriginPaint();
 
+
 	void	automaticPaint();				
-	void	setAutoType(int type);
+	void	setAutoType(int type); // sequentially or randomly.
 
 	void	multiResPaint();
+
+	void	edgePaint(); // Paint the edge picture.
 
 // Attributes
 public:
@@ -70,6 +75,7 @@ public:
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
+	ImpBrush*			m_pEdgeBrush;
 	// Size of the brush.
 	int m_nSize;
 	int m_nAngleType;
@@ -77,7 +83,7 @@ public:
 	ImpressionistUI*	m_pUI;
 
 	// The way to auto draw.
-	int m_nAutoType;
+	int m_nAutoType; // two choices.
 
 // Operations
 public:

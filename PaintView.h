@@ -40,11 +40,15 @@ public:
 
 	ImpressionistDoc *m_pDoc;
 
+	// All these painting methods are implemented in the draw() function as an event_To_Do.
+
 	void autoPaint();
 
 	void loopPaint(int iIncrement, int jIncrement, bool diffCheck);
 
 	void multiResPaint();
+
+	void edgePaint();
 
 
 private:
@@ -57,8 +61,8 @@ private:
 			m_nEndCol,
 			m_nWindowWidth, 
 			m_nWindowHeight;
-	bool	m_bSwap,
-		m_bMove;
+	bool	m_bSwap, // Indicate whether a swap has been done.(to disable undo).
+			m_bMove; // Indicate whether the mouse moves or not.
 
 };
 

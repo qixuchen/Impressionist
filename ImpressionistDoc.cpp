@@ -20,6 +20,7 @@
 #include "ScatterLineBrush.h"
 #include "ScatterCircleBrush.h"
 #include "CurveBrush.h"
+#include "EdgeBrush.h"
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -57,6 +58,8 @@ ImpressionistDoc::ImpressionistDoc()
 		= new ScatterCircleBrush( this, "Scattered Circles" );
 	ImpBrush::c_pBrushes[BRUSH_CURVE_LINES]
 		= new CurveBrush(this, "Curve Lines");
+
+	m_pEdgeBrush = new EdgeBrush(this, "Edges");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
@@ -138,6 +141,10 @@ void ImpressionistDoc::setWidth(int width)
 	m_pUI->setWidth(width);
 }
 
+int ImpressionistDoc::getEdgeThreshold()
+{
+	return m_pUI->getEdgeThreshold();
+}
 //---------------------------------------------------------
 // Returns the angle
 //---------------------------------------------------------
@@ -412,4 +419,8 @@ void ImpressionistDoc::automaticPaint() {
 
 void ImpressionistDoc::multiResPaint() {
 	m_pUI->m_paintView->multiResPaint();
+}
+
+void ImpressionistDoc::edgePaint() {
+	m_pUI->m_paintView->edgePaint();
 }

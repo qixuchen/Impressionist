@@ -20,6 +20,7 @@
 #define RIGHT_MOUSE_UP		6
 #define AUTO_DRAW			7
 #define MULTI_RES			8
+#define EDGE_PIC			9
 
 
 #ifndef WIN32
@@ -291,6 +292,7 @@ void PaintView::draw()
 			
 			break;
 
+		// Extra Credit.
 		case MULTI_RES: {
 			m_bSwap = false;
 			
@@ -313,6 +315,26 @@ void PaintView::draw()
 			
 			break;
 		}
+
+		// Part of the extra credit.
+		case EDGE_PIC:
+			for (int i = 0; i < m_nDrawWidth; i++) {
+				for (int j = 0; j < m_nDrawHeight; j++) {
+					Point currentPoint(i, j);
+					Point source(0, 0), target(0, 0);
+					ImpBrush* temp = m_pDoc->m_pCurrentBrush;
+					m_pDoc->m_pCurrentBrush = m_pDoc->m_pEdgeBrush;
+					source.x = (currentPoint.x > m_nDrawWidth ? m_nDrawWidth : (currentPoint.x > 0 ? currentPoint.x : 0)) + m_nStartCol;
+					source.y = m_nEndRow - (currentPoint.y > m_nDrawHeight ? m_nDrawHeight : (currentPoint.y > 0 ? currentPoint.y : 0));
+					target.x = currentPoint.x;
+					target.y = m_nWindowHeight - currentPoint.y;
+					m_pDoc->m_pCurrentBrush->BrushMove(source, target);
+					m_pDoc->m_pCurrentBrush = temp;
+				}
+			}
+			SaveCurrentContent();
+			RestoreContent();
+			break;
 
 		default:
 			printf("Unknown event!!\n");		
@@ -465,12 +487,6 @@ void PaintView::SwapOrgPnt() {
 
 }
 
-void PaintView::autoPaint() {
-	isAnEvent = 1;
-	eventToDo = AUTO_DRAW;
-	redraw();
-}
-
 void PaintView::loopPaint(int iIncrement, int jIncrement, bool diffCheck) {
 	for (int i = (int)(-iIncrement); i < m_nDrawWidth + iIncrement; i += iIncrement) {
 		for (int j = (int)(-jIncrement); j < m_nDrawHeight + jIncrement; j += jIncrement) {
@@ -503,8 +519,29 @@ void PaintView::loopPaint(int iIncrement, int jIncrement, bool diffCheck) {
 	RestoreContent();
 }
 
+void PaintView::autoPaint() {
+	if (m_pDoc->m_pUI->m_origView->m_bImage) {
+		isAnEvent = 1;
+		eventToDo = AUTO_DRAW;
+		redraw();
+	}
+
+}
+
 void PaintView::multiResPaint() {
-	isAnEvent = 1;
-	eventToDo = MULTI_RES;
-	redraw();
+	// If a pic has been loaded.
+	if (m_pDoc->m_pUI->m_origView->m_bImage) {
+		isAnEvent = 1;
+		eventToDo = MULTI_RES;
+		redraw();
+	}
+}
+
+void PaintView::edgePaint() {
+	// If a pic has been loaded.
+	if (m_pDoc->m_pUI->m_origView->m_bImage) {
+		isAnEvent = 1;
+		eventToDo = EDGE_PIC;
+		redraw();
+	}
 }

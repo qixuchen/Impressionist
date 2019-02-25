@@ -40,7 +40,7 @@ public:
 
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_AngleTypeChoice;
-	Fl_Choice*			m_AutoTypeChoice;
+	Fl_Choice*			m_AutoTypeChoice; // For autoDraw.
 
 
 	enum anglemode{
@@ -51,7 +51,7 @@ public:
 	};
 
 	enum automode {
-		REGULAR = 0,
+		REGULAR = 0, //It is called sequential on the UI.
 		RANDOM
 	};
 
@@ -59,9 +59,11 @@ public:
 	Fl_Slider*			m_BrushWidthSlider;
 	Fl_Slider*			m_BrushAngleSlider;
 	Fl_Slider*			m_BrushAlphaSlider;
+	Fl_Slider*			m_EdgeThresholdSlider;
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button*          m_autoPaintButton;
 	Fl_Button*          m_multiResPaintButton;
+	Fl_Button*          m_edgePaintButton;
 
 	//color control
 	Fl_Slider*			m_redSlider;
@@ -97,6 +99,8 @@ public:
 
 	bool				getColorControlMode();
 
+	int					getEdgeThreshold();
+
 	
 	private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
@@ -106,6 +110,7 @@ public:
 	int     m_nWidth;
 	int     m_nAngle;
 	float     m_nAlpha;
+	int		m_nEdgeThreshold;
 
 	int m_nRed, m_nGreen, m_nBlue;
 
@@ -143,12 +148,14 @@ public:
 	static void	cb_widthSlides(Fl_Widget* o, void* v);
 	static void	cb_angleSlides(Fl_Widget* o, void* v);
 	static void	cb_alphaSlides(Fl_Widget* o, void* v);
+	static void	cb_edgeThresholdSlides(Fl_Widget* o, void* v);
 	static void	cb_redSlides(Fl_Widget* o, void* v);
 	static void	cb_greenSlides(Fl_Widget* o, void* v);
 	static void	cb_blueSlides(Fl_Widget* o, void* v);
 	static void cb_auto_paint_button(Fl_Widget* o, void* v);
 	static void cb_autoChoice(Fl_Widget* o, void* v);
 	static void cb_multi_res_paint_button(Fl_Widget* o, void* v);
+	static void cb_edge_paint_button(Fl_Widget* o, void* v);
 
 };
 

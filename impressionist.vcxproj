@@ -143,6 +143,7 @@
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="CircleBrush.cpp" />
     <ClCompile Include="CurveBrush.cpp" />
+    <ClCompile Include="EdgeBrush.cpp" />
     <ClCompile Include="ImpBrush.cpp" />
     <ClCompile Include="Impressionist.cpp" />
     <ClCompile Include="ImpressionistDoc.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="OriginalView.cpp" />
     <ClCompile Include="PaintView.cpp" />
     <ClCompile Include="PointBrush.cpp" />
+    <ClCompile Include="RubberBrush.cpp" />
     <ClCompile Include="ScatterCircleBrush.cpp" />
     <ClCompile Include="ScatterLineBrush.cpp" />
     <ClCompile Include="ScatterPointBrush.cpp" />
@@ -159,6 +161,7 @@
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="CircleBrush.h" />
     <ClInclude Include="CurveBrush.h" />
+    <ClInclude Include="EdgeBrush.h" />
     <ClInclude Include="ImpBrush.h" />
     <ClInclude Include="impressionist.h" />
     <ClInclude Include="impressionistDoc.h" />
@@ -167,6 +170,7 @@
     <ClInclude Include="OriginalView.h" />
     <ClInclude Include="PaintView.h" />
     <ClInclude Include="PointBrush.h" />
+    <ClInclude Include="RubberBrush.h" />
     <ClInclude Include="ScatterCircleBrush.h" />
     <ClInclude Include="ScatterLineBrush.h" />
     <ClInclude Include="ScatterPointBrush.h" />

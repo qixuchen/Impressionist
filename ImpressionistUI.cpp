@@ -355,6 +355,14 @@ void ImpressionistUI::cb_multi_res_paint_button(Fl_Widget* o, void* v)
 	pDoc->multiResPaint();
 }
 
+// Self-explanatory
+void ImpressionistUI::cb_edge_paint_button(Fl_Widget* o, void* v)
+{
+	ImpressionistDoc * pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->edgePaint();
+}
+
 //-----------------------------------------------------------
 // Updates the brush size to use from the value of the size
 // slider
@@ -395,6 +403,10 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_nAlpha = float(((Fl_Slider *)o)->value());
 }
 
+void ImpressionistUI::cb_edgeThresholdSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nEdgeThreshold = int(((Fl_Slider *)o)->value());
+}
 
 
 //-----------------------------------------------------------
@@ -487,6 +499,11 @@ void ImpressionistUI::setSize( int size )
 int ImpressionistUI::getWidth()
 {
 	return m_nWidth;
+}
+
+int ImpressionistUI::getEdgeThreshold()
+{
+	return m_nEdgeThreshold;
 }
 
 //-------------------------------------------------
@@ -650,11 +667,12 @@ ImpressionistUI::ImpressionistUI() {
 	m_nWidth = 1;
 	m_nAngle = 0;
 	m_nAlpha = 1.0;
+	m_nEdgeThreshold = 5;
 	m_nRed = m_nGreen = m_nBlue = 0;
 	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
 
 	// brush dialog definition
-	m_brushDialog = new Fl_Window(400, 350, "Brush Dialog");
+	m_brushDialog = new Fl_Window(400, 390, "Brush Dialog");
 		// Add a brush type choice to the dialog
 		m_BrushTypeChoice = new Fl_Choice(50,10,150,25,"&Brush");
 		m_BrushTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
@@ -740,6 +758,22 @@ ImpressionistUI::ImpressionistUI() {
 		m_multiResPaintButton = new Fl_Button(10, 320, 150, 20, "&Multi Res Paint");
 		m_multiResPaintButton->user_data((void*)(this));
 		m_multiResPaintButton->callback(cb_multi_res_paint_button);
+
+		m_EdgeThresholdSlider = new Fl_Value_Slider(10, 360, 150, 20, "Edge");
+		m_EdgeThresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_EdgeThresholdSlider->type(FL_HOR_NICE_SLIDER);
+		m_EdgeThresholdSlider->labelfont(FL_COURIER);
+		m_EdgeThresholdSlider->labelsize(12);
+		m_EdgeThresholdSlider->minimum(1);
+		m_EdgeThresholdSlider->maximum(20);
+		m_EdgeThresholdSlider->step(1);
+		m_EdgeThresholdSlider->value(m_nEdgeThreshold);
+		m_EdgeThresholdSlider->align(FL_ALIGN_RIGHT);
+		m_EdgeThresholdSlider->callback(cb_edgeThresholdSlides);
+
+		m_edgePaintButton = new Fl_Button(220, 360, 150, 20, "&Edge Paint");
+		m_edgePaintButton->user_data((void*)(this));
+		m_edgePaintButton->callback(cb_edge_paint_button);
 
     m_brushDialog->end();	
 
