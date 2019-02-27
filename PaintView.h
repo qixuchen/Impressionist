@@ -38,6 +38,7 @@ public:
 
 	void SwapOrgPnt();
 
+	void Dissolve();
 	ImpressionistDoc *m_pDoc;
 
 	// All these painting methods are implemented in the draw() function as an event_To_Do.

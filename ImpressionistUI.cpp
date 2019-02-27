@@ -223,6 +223,20 @@ void ImpressionistUI::cb_load_alpha(Fl_Menu_* o, void* v)
 }
 
 //------------------------------------------------------------------
+// load dissolve image
+//------------------------------------------------------------------
+void ImpressionistUI::cb_importDissolveImg(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI *)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadDissolveAlpha(newfile);
+	}
+}
+
+
+//------------------------------------------------------------------
 // Brings up a file chooser and then saves the painted image
 // This is called by the UI when the save image menu item is chosen
 //------------------------------------------------------------------
@@ -253,6 +267,15 @@ void ImpressionistUI::cb_brushes(Fl_Menu_* o, void* v)
 void ImpressionistUI::cb_Color(Fl_Menu_* o, void* v)
 {
 	whoami(o)->m_colorDialog->show();
+}
+
+
+//-------------------------------------------------------------
+// Brings up the dissolve dialog
+//-------------------------------------------------------------
+void ImpressionistUI::cb_dissolve(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_dissolveDialog->show();
 }
 
 //------------------------------------------------------------
@@ -417,6 +440,16 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_nAlpha = float(((Fl_Slider *)o)->value());
 }
 
+
+//-----------------------------------------------------------
+// Updates the dissolve alpha
+// Called by the UI when the dissolve alpha slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_DissolveAlphaSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_nDissolveAlpha = float(((Fl_Slider *)o)->value());
+}
+
 void ImpressionistUI::cb_edgeThresholdSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nEdgeThreshold = int(((Fl_Slider *)o)->value());
@@ -443,6 +476,15 @@ void ImpressionistUI::cb_blueSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nBlue = int(((Fl_Slider *)o)->value());
 	((ImpressionistUI*)(o->user_data()))->m_nManualColorControl = true;
+}
+
+
+//-----------------------------------------------------------
+// Apply dissolve
+//-----------------------------------------------------------
+void ImpressionistUI::cb_applyDissolve(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_paintView->Dissolve();
 }
 
 
@@ -570,6 +612,29 @@ void ImpressionistUI::setAlpha(float alpha)
 }
 
 
+//------------------------------------------------
+// Return the dissolve alpha
+//------------------------------------------------
+float ImpressionistUI::getDissolveAlpha()
+{
+	return m_nDissolveAlpha;
+}
+
+//-------------------------------------------------
+// Set the dissolve alpha
+//-------------------------------------------------
+void ImpressionistUI::setDissolveAlpha(float alpha)
+{
+	m_nDissolveAlpha = alpha;
+
+	if (alpha <= 1.0)
+		m_DissolveAlphaSlider->value(m_nDissolveAlpha);
+}
+
+
+
+
+
 bool ImpressionistUI::getColorControlMode()
 {
 	return m_nManualColorControl;
@@ -606,6 +671,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 
 	{ "&Option",		0, 0, 0, FL_SUBMENU },
 		{ "&Undo",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_undo },
+		{ "&Dissolve",	FL_ALT + 'd', (Fl_Callback *)ImpressionistUI::cb_dissolve },
 		{ "&Swap",	FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_swap },
 		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
@@ -682,6 +748,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nWidth = 1;
 	m_nAngle = 0;
 	m_nAlpha = 1.0;
+	m_nDissolveAlpha = 0.0;
 	m_nEdgeThreshold = 5;
 	m_nRed = m_nGreen = m_nBlue = 0;
 	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
@@ -831,5 +898,27 @@ ImpressionistUI::ImpressionistUI() {
 		m_blueSlider->callback(cb_blueSlides);
 
 	m_colorDialog->end();
+
+	m_dissolveDialog = new Fl_Window(250, 150, "Dissolve");
+		m_DissolveAlphaSlider = new Fl_Value_Slider(10, 30, 150, 20, "Alpha");
+		m_DissolveAlphaSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_DissolveAlphaSlider->type(FL_HOR_NICE_SLIDER);
+		m_DissolveAlphaSlider->labelfont(FL_COURIER);
+		m_DissolveAlphaSlider->labelsize(12);
+		m_DissolveAlphaSlider->minimum(0.00);
+		m_DissolveAlphaSlider->maximum(1.00);
+		m_DissolveAlphaSlider->step(0.01);
+		m_DissolveAlphaSlider->value(m_nDissolveAlpha);
+		m_DissolveAlphaSlider->align(FL_ALIGN_RIGHT);
+		m_DissolveAlphaSlider->callback(cb_DissolveAlphaSlides);
+
+		m_importDissolveImgButton = new Fl_Button(60, 100, 100, 30, "Import Image");
+		m_importDissolveImgButton->user_data((void*)(this));
+		m_importDissolveImgButton->callback(cb_importDissolveImg);
+		m_applyDissolveButton = new Fl_Button(170, 100, 60, 30, "Apply");
+		m_applyDissolveButton->user_data((void*)(this));
+		m_applyDissolveButton->callback(cb_applyDissolve);
+		m_applyDissolveButton->deactivate();
+	m_dissolveDialog->end();
 
 }

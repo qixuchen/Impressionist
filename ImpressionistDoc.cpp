@@ -33,8 +33,10 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
+	m_ucsave = NULL;
 	m_ucGradient = NULL;
 	m_ucAlpha = NULL;
+	m_ucDissolve = NULL;
 
 	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
 	m_nAutoType = ImpressionistUI::automode::REGULAR;
@@ -173,6 +175,15 @@ float ImpressionistDoc::getAlpha()
 	return m_pUI->getAlpha();
 }
 
+
+//---------------------------------------------------------
+// Returns the dissolve alpha
+//---------------------------------------------------------
+float ImpressionistDoc::getDissolveAlpha()
+{
+	return m_pUI->getDissolveAlpha();
+}
+
 //---------------------------------------------------------
 // Load the specified image
 // This is called by the UI when the load image button is 
@@ -218,6 +229,9 @@ int ImpressionistDoc::loadImage(char *iname, bool mural)
 	// Condition added for 1.5-point extra credit #2.
 	if(!mural)
 		if ( m_ucPainting ) delete [] m_ucPainting;
+
+	// COndition added for dissolve image
+	if (m_ucDissolve != NULL) m_pUI->m_applyDissolveButton->activate();
 
 	m_ucBitmap		= data;
 
@@ -324,6 +338,38 @@ int ImpressionistDoc::loadAlpha(char *iname)
 	m_ucAlpha = data;
 
 
+	return 1;
+}
+
+
+
+//---------------------------------------------------------
+// Load the specified image to represent Alpha
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::loadDissolveAlpha(char *iname)
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width, height;
+
+	if ((data = readBMP(iname, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	// reflect the fact of loading the new image
+	m_nDissolveAlphaWidth = width;
+	m_nDissolveAlphaHeight = height;
+
+	// release old storage
+	if (m_ucDissolve) delete[] m_ucDissolve;
+
+	m_ucDissolve = data;
+
+	if(m_ucBitmap!=NULL)	m_pUI->m_applyDissolveButton->activate();
 	return 1;
 }
 

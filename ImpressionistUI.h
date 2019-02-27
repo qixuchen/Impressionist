@@ -37,6 +37,7 @@ public:
 // for brush dialog
 	Fl_Window*			m_brushDialog;
 	Fl_Window*			m_colorDialog;
+	Fl_Window*			m_dissolveDialog;
 
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_AngleTypeChoice;
@@ -60,11 +61,14 @@ public:
 	Fl_Slider*			m_BrushAngleSlider;
 	Fl_Slider*			m_BrushAlphaSlider;
 	Fl_Slider*			m_EdgeThresholdSlider;
+	Fl_Slider*			m_DissolveAlphaSlider;
+
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button*          m_autoPaintButton;
 	Fl_Button*          m_multiResPaintButton;
 	Fl_Button*          m_edgePaintButton;
-
+	Fl_Button*          m_applyDissolveButton;
+	Fl_Button*          m_importDissolveImgButton;
 	//color control
 	Fl_Slider*			m_redSlider;
 	Fl_Slider*			m_greenSlider;
@@ -93,6 +97,9 @@ public:
 	float               getAlpha();
 	void                setAlpha(float alpha);
 
+	float               getDissolveAlpha();
+	void                setDissolveAlpha(float alpha);
+
 	int					getRed();
 	int					getGreen();
 	int					getBlue();
@@ -111,6 +118,8 @@ public:
 	int     m_nAngle;
 	float     m_nAlpha;
 	int		m_nEdgeThreshold;
+	float	m_nDissolveAlpha;
+
 
 	int m_nRed, m_nGreen, m_nBlue;
 
@@ -140,6 +149,7 @@ public:
 	static void	cb_load_alpha(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_undo(Fl_Menu_* o, void* v);
+	static void	cb_dissolve(Fl_Menu_* o, void* v);
 	static void	cb_swap(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
@@ -150,6 +160,7 @@ public:
 	static void	cb_angleSlides(Fl_Widget* o, void* v);
 	static void	cb_alphaSlides(Fl_Widget* o, void* v);
 	static void	cb_edgeThresholdSlides(Fl_Widget* o, void* v);
+	static void	cb_DissolveAlphaSlides(Fl_Widget* o, void* v);
 	static void	cb_redSlides(Fl_Widget* o, void* v);
 	static void	cb_greenSlides(Fl_Widget* o, void* v);
 	static void	cb_blueSlides(Fl_Widget* o, void* v);
@@ -157,7 +168,8 @@ public:
 	static void cb_autoChoice(Fl_Widget* o, void* v);
 	static void cb_multi_res_paint_button(Fl_Widget* o, void* v);
 	static void cb_edge_paint_button(Fl_Widget* o, void* v);
-
+	static void cb_importDissolveImg(Fl_Widget* o, void* v);
+	static void cb_applyDissolve(Fl_Widget* o, void* v);
 };
 
 #endif

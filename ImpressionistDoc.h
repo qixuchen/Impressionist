@@ -23,7 +23,7 @@ public:
 	int		saveImage(char *iname);			// called by the UI to save image
 	int		loadGrad(char *iname);			// called by the UI to load  GRADIENT image
 	int		loadAlpha(char *iname);			// called by the UI to load  ALPHA image
-
+	int		loadDissolveAlpha(char *iname);			// called by the UI to load  ALPHA image
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	void	setBrushType(int type);			// called by the UI to set the brushType
@@ -36,6 +36,8 @@ public:
 	void	setAngle(int angle);			// set the brush angle
 	float	getAlpha();						// get the brush alpha
 	void	setAlpha(float alpha);			// set the brush alpha
+	float	getDissolveAlpha();					// get the dissolve alpha
+	void	setDissolveAlpha(float alpha);		// set the dissolve alpha
 	char*	getImageName();					// get the current image name
 
 	int     getEdgeThreshold();
@@ -59,13 +61,20 @@ public:
 	int				m_nPaintWidth, 
 					m_nPaintHeight;	
 
-	//Dimensions of the gradient image window.
+	//Dimensions of the gradient image.
 	int				m_nGradWidth,
 					m_nGradHeight;
 
-	//Dimensions of the alpha image window.
+	//Dimensions of the alpha image.
 	int				m_nAlphaWidth,
 					m_nAlphaHeight;
+
+	//Dimensions of the alpha image.
+	int				m_nDissolveAlphaWidth,
+					m_nDissolveAlphaHeight;
+
+				
+
 
 	// Bitmaps for original image and painting.
 	unsigned char*	m_ucBitmap;
@@ -79,6 +88,8 @@ public:
 	//Bitmaps for alpha
 	unsigned char* m_ucAlpha;
 
+	//Bitmaps for dissolve img
+	unsigned char* m_ucDissolve;
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	

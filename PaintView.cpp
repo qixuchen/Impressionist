@@ -460,7 +460,7 @@ void PaintView::RestoreContent()
 void PaintView::Undo() {
 
 	// Add a boolean checking.
-	if (!m_bSwap) {
+	if (!m_bSwap&&m_pDoc->m_ucsave!=NULL) {
 		memcpy(m_pDoc->m_ucPainting, m_pDoc->m_ucsave, m_pDoc->m_nPaintWidth*m_pDoc->m_nPaintHeight * 3);
 		glDrawBuffer(GL_FRONT_AND_BACK);
 		redraw();
@@ -543,5 +543,30 @@ void PaintView::edgePaint() {
 		isAnEvent = 1;
 		eventToDo = EDGE_PIC;
 		redraw();
+	}
+}
+
+void PaintView::Dissolve() {
+	if (m_pDoc->m_ucDissolve != NULL) {
+		int dw = m_pDoc->m_nDissolveAlphaWidth;
+		int dh = m_pDoc->m_nDissolveAlphaHeight;
+		int pw = m_pDoc->m_nPaintWidth;
+		int ph = m_pDoc->m_nPaintHeight;
+		GLubyte dImg[3]; //the pixel of dissolve image
+		float alpha = m_pDoc->getDissolveAlpha();
+		
+		for (int i = 0; i < ph; i++) {
+			for (int j = 0; j < pw; j++) {
+				GLubyte* pixel= m_pDoc->m_ucPainting + 3 * (i*pw + j);
+				int dx = j * 1.0 / pw * dw;
+				int dy = i * 1.0 / ph * dh;
+				memcpy(dImg, m_pDoc->m_ucDissolve + 3 * (dy*dw + dx), 3);
+				
+				*pixel = (int)((1 - alpha)*(*pixel) + (alpha)*dImg[0]);
+				*(pixel+1) = (int)((1 - alpha)*(*(pixel+1)) + (alpha)*dImg[1]);
+				*(pixel+2) = (int)((1 - alpha)*(*(pixel+2)) + (alpha)*dImg[2]);
+			}
+		}
+		refresh();
 	}
 }
