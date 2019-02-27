@@ -34,7 +34,21 @@ void OriginalView::draw()
 #endif // !MESA
 	// Whistle 3
 	// Drawing for the cursor movement is updated here.
-	if (isAnEvent) {
+
+	if (!valid())
+	{
+		glClearColor(0.7f, 0.7f, 0.7f, 1.0);
+
+		// We're only using 2-D, so turn off depth 
+		glDisable(GL_DEPTH_TEST);
+
+		// Tell openGL to read from the front buffer when capturing
+		// out paint strokes 
+		glReadBuffer(GL_FRONT);
+		ortho();
+
+	}
+	if (isAnEvent && valid()) {
 		if (m_bImage) {
 			if (isAnEvent == 1) {
 				SaveCurrentContent();
@@ -47,20 +61,7 @@ void OriginalView::draw()
 		isAnEvent = 0;
 	}
 	else {
-		if (!valid())
-		{
-			glClearColor(0.7f, 0.7f, 0.7f, 1.0);
-
-			// We're only using 2-D, so turn off depth 
-			glDisable(GL_DEPTH_TEST);
-
-			// Tell openGL to read from the front buffer when capturing
-			// out paint strokes 
-			glReadBuffer(GL_FRONT);
-			ortho();
-
-		}
-
+		
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		if (m_pDoc->m_ucBitmap)
@@ -138,7 +139,7 @@ void OriginalView::SaveCurrentContent()
 	glReadBuffer(GL_FRONT);
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_PACK_ROW_LENGTH, drawWidth);
+	glPixelStorei(GL_PACK_ROW_LENGTH, m_pDoc->m_nPaintWidth);
 
 	glReadPixels(0,
 		m_nWindowHeight - drawHeight,
@@ -158,7 +159,7 @@ void OriginalView::RestoreContent()
 
 	glRasterPos2i(0, m_nWindowHeight - drawHeight);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, drawWidth);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, m_pDoc->m_nPaintWidth);
 	glDrawPixels(drawWidth,
 		drawHeight,
 		GL_RGB,
