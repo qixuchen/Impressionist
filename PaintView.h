@@ -51,9 +51,13 @@ public:
 
 	void edgePaint();
 
+	void clearBackground(float alpha);
+	void addBackground(float alpha);
+
 
 private:
 	GLvoid* m_pPaintBitstart;
+	GLvoid* m_pActualBitstart;
 	int		m_nDrawWidth,
 			m_nDrawHeight,
 			m_nStartRow, 

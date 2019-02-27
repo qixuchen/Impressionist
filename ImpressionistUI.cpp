@@ -278,6 +278,14 @@ void ImpressionistUI::cb_dissolve(Fl_Menu_* o, void* v)
 	whoami(o)->m_dissolveDialog->show();
 }
 
+//-------------------------------------------------------------
+// Brings up the background dialog
+//-------------------------------------------------------------
+void ImpressionistUI::cb_background(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_backgroundDialog->show();
+}
+
 //------------------------------------------------------------
 // Clears the paintview canvas.
 // Called by the UI when the clear canvas menu item is chosen
@@ -449,6 +457,21 @@ void ImpressionistUI::cb_DissolveAlphaSlides(Fl_Widget* o, void* v)
 {
 	((ImpressionistUI*)(o->user_data()))->m_nDissolveAlpha = float(((Fl_Slider *)o)->value());
 }
+
+
+//-----------------------------------------------------------
+// Updates the backgrounnd alpha
+// Called by the UI when the dissolve alpha slider is moved
+//-----------------------------------------------------------
+void ImpressionistUI::cb_backgroundAlphaSlides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_paintView->clearBackground(((ImpressionistUI*)(o->user_data()))->m_nbackgroundAlpha);//clear original background
+	((ImpressionistUI*)(o->user_data()))->m_nbackgroundAlpha = float(((Fl_Slider *)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_paintView->addBackground(((ImpressionistUI*)(o->user_data()))->m_nbackgroundAlpha);//add new background
+	((ImpressionistUI*)(o->user_data()))->m_paintView->refresh();
+
+}
+
 
 void ImpressionistUI::cb_edgeThresholdSlides(Fl_Widget* o, void* v)
 {
@@ -631,7 +654,24 @@ void ImpressionistUI::setDissolveAlpha(float alpha)
 		m_DissolveAlphaSlider->value(m_nDissolveAlpha);
 }
 
+//------------------------------------------------
+// Return the background alpha
+//------------------------------------------------
+float ImpressionistUI::getBackgroundAlpha()
+{
+	return m_nbackgroundAlpha;
+}
 
+//-------------------------------------------------
+// Set the background alpha
+//-------------------------------------------------
+void ImpressionistUI::setBackgroundAlpha(float alpha)
+{
+	m_nbackgroundAlpha = alpha;
+
+	if (alpha <= 1.0)
+		m_backgroundAlphaSlider->value(m_nbackgroundAlpha);
+}
 
 
 
@@ -673,6 +713,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Undo",	FL_ALT + 'u', (Fl_Callback *)ImpressionistUI::cb_undo },
 		{ "&Dissolve",	FL_ALT + 'd', (Fl_Callback *)ImpressionistUI::cb_dissolve },
 		{ "&Swap",	FL_ALT + 'p', (Fl_Callback *)ImpressionistUI::cb_swap },
+		{ "&Background",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_background },
 		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
 		{ "&About",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_about },
@@ -749,6 +790,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_nAngle = 0;
 	m_nAlpha = 1.0;
 	m_nDissolveAlpha = 0.0;
+	m_nbackgroundAlpha = 0.0;
 	m_nEdgeThreshold = 5;
 	m_nRed = m_nGreen = m_nBlue = 0;
 	AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].deactivate();
@@ -920,5 +962,21 @@ ImpressionistUI::ImpressionistUI() {
 		m_applyDissolveButton->callback(cb_applyDissolve);
 		m_applyDissolveButton->deactivate();
 	m_dissolveDialog->end();
+
+
+	m_backgroundDialog = new Fl_Window(250, 80, "Background");
+	m_backgroundAlphaSlider = new Fl_Value_Slider(35, 30, 150, 20, "Alpha");
+	m_backgroundAlphaSlider->user_data((void*)(this));	// record self to be used by static callback functions
+	m_backgroundAlphaSlider->type(FL_HOR_NICE_SLIDER);
+	m_backgroundAlphaSlider->labelfont(FL_COURIER);
+	m_backgroundAlphaSlider->labelsize(12);
+	m_backgroundAlphaSlider->minimum(0.00);
+	m_backgroundAlphaSlider->maximum(1.00);
+	m_backgroundAlphaSlider->step(0.01);
+	m_backgroundAlphaSlider->value(m_nbackgroundAlpha);
+	m_backgroundAlphaSlider->align(FL_ALIGN_RIGHT);
+	m_backgroundAlphaSlider->callback(cb_backgroundAlphaSlides);
+
+	m_backgroundDialog->end();
 
 }

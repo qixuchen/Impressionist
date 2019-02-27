@@ -85,6 +85,9 @@ void PaintView::draw()
 	m_pPaintBitstart = m_pDoc->m_ucPainting + 
 		3 * ((m_pDoc->m_nPaintWidth * startrow) + scrollpos.x);
 
+	m_pActualBitstart = m_pDoc->m_ucActualMap +
+		3 * ((m_pDoc->m_nPaintWidth * startrow) + scrollpos.x);
+
 	m_nDrawWidth	= drawWidth;
 	m_nDrawHeight	= drawHeight;
 
@@ -447,6 +450,7 @@ void PaintView::RestoreContent()
 	glRasterPos2i( 0, m_nWindowHeight - m_nDrawHeight );
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_UNPACK_ROW_LENGTH, m_pDoc->m_nPaintWidth );
+
 	glDrawPixels( m_nDrawWidth, 
 				  m_nDrawHeight, 
 				  GL_RGB, 
@@ -567,6 +571,56 @@ void PaintView::Dissolve() {
 				*(pixel+2) = (int)((1 - alpha)*(*(pixel+2)) + (alpha)*dImg[2]);
 			}
 		}
+		//SaveCurrentContent();
+		//RestoreContent();
 		refresh();
 	}
 }
+
+void PaintView::clearBackground(float alpha) {
+	
+	for (int i = 0; i < m_nDrawHeight; i++) {
+		for(int j=0; j<m_nDrawWidth;j++){
+			int offset = 3 * (i*m_pDoc->m_nWidth + j);
+			GLubyte dImg[3];
+			memcpy(dImg, m_pDoc->m_ucBitmap +offset, 3);
+			GLubyte* pixel = m_pDoc->m_ucPainting + offset;
+			for (int p = 0; p < 3; p++) {
+				if ((*(pixel + p) - (int)((alpha)*dImg[p] / 2)) < 0) *(pixel + p) = 0;
+				else *(pixel + p) -= (int)((alpha)*dImg[p] / 2);
+			}
+		}
+	}
+}
+
+void PaintView::addBackground(float alpha) {
+
+	for (int i = 0; i < m_nDrawHeight; i++) {
+		for (int j = 0; j < m_nDrawWidth; j++) {
+			int offset = 3 * (i*m_pDoc->m_nWidth + j);
+			GLubyte dImg[3];
+			memcpy(dImg, m_pDoc->m_ucBitmap + offset, 3);
+			GLubyte* pixel = m_pDoc->m_ucPainting + offset;
+			for (int p = 0; p < 3; p++) {
+				if ((*(pixel + p) + (int)((alpha)*dImg[p] / 2)) > 255) *(pixel + p) = 255;
+				else *(pixel + p) += (int)((alpha)*dImg[p] / 2);
+			}
+		}
+	}
+}
+
+
+/*
+for (int i = 0; i < m_nDrawHeight; i++) {
+	for(int j=0; j<m_nDrawWidth;j++){
+		int offset = 3 * (i*m_pDoc->m_nWidth + j);
+		GLubyte dImg[3];
+		GLubyte p[3];
+		memcpy(p, m_pDoc->m_ucPainting + offset, 3);
+		memcpy(dImg, m_pDoc->m_ucBitmap +offset, 3);
+		GLubyte* pixel = m_pDoc->m_ucActualMap + offset;
+		*pixel = (int)(((1 - 0.2)*p[0]) + (0.2)*dImg[0]);
+		*(pixel + 1) = (int)(((1 - 0.2)*p[1]) + (0.2)*dImg[1]);
+		*(pixel + 2) = (int)(((1 - 0.2)*p[2]) + (0.2)*dImg[2]);
+	}
+}*/

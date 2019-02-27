@@ -38,6 +38,8 @@ public:
 	void	setAlpha(float alpha);			// set the brush alpha
 	float	getDissolveAlpha();					// get the dissolve alpha
 	void	setDissolveAlpha(float alpha);		// set the dissolve alpha
+	float	getBackgroundAlpha();					// get the background alpha
+	void	setBackgroundAlpha(float alpha);		// set the background alpha
 	char*	getImageName();					// get the current image name
 
 	int     getEdgeThreshold();
@@ -90,6 +92,9 @@ public:
 
 	//Bitmaps for dissolve img
 	unsigned char* m_ucDissolve;
+
+	//Bitmaps for backgrounded canvas
+	unsigned char* m_ucActualMap;
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	

@@ -38,6 +38,7 @@ public:
 	Fl_Window*			m_brushDialog;
 	Fl_Window*			m_colorDialog;
 	Fl_Window*			m_dissolveDialog;
+	Fl_Window*			m_backgroundDialog;
 
 	Fl_Choice*			m_BrushTypeChoice;
 	Fl_Choice*			m_AngleTypeChoice;
@@ -62,6 +63,7 @@ public:
 	Fl_Slider*			m_BrushAlphaSlider;
 	Fl_Slider*			m_EdgeThresholdSlider;
 	Fl_Slider*			m_DissolveAlphaSlider;
+	Fl_Slider*			m_backgroundAlphaSlider;
 
 	Fl_Button*          m_ClearCanvasButton;
 	Fl_Button*          m_autoPaintButton;
@@ -100,6 +102,9 @@ public:
 	float               getDissolveAlpha();
 	void                setDissolveAlpha(float alpha);
 
+	float               getBackgroundAlpha();
+	void                setBackgroundAlpha(float alpha);
+
 	int					getRed();
 	int					getGreen();
 	int					getBlue();
@@ -119,6 +124,7 @@ public:
 	float     m_nAlpha;
 	int		m_nEdgeThreshold;
 	float	m_nDissolveAlpha;
+	float	m_nbackgroundAlpha;
 
 
 	int m_nRed, m_nGreen, m_nBlue;
@@ -152,6 +158,7 @@ public:
 	static void	cb_dissolve(Fl_Menu_* o, void* v);
 	static void	cb_swap(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
+	static void cb_background(Fl_Menu_* o, void* v);
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void cb_angleChoice(Fl_Widget* o, void* v);
 	static void	cb_clear_canvas_button(Fl_Widget* o, void* v);
@@ -161,6 +168,7 @@ public:
 	static void	cb_alphaSlides(Fl_Widget* o, void* v);
 	static void	cb_edgeThresholdSlides(Fl_Widget* o, void* v);
 	static void	cb_DissolveAlphaSlides(Fl_Widget* o, void* v);
+	static void	cb_backgroundAlphaSlides(Fl_Widget* o, void* v);
 	static void	cb_redSlides(Fl_Widget* o, void* v);
 	static void	cb_greenSlides(Fl_Widget* o, void* v);
 	static void	cb_blueSlides(Fl_Widget* o, void* v);

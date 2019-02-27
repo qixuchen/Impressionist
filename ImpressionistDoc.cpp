@@ -37,6 +37,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucGradient = NULL;
 	m_ucAlpha = NULL;
 	m_ucDissolve = NULL;
+	m_ucActualMap = NULL;
 
 	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
 	m_nAutoType = ImpressionistUI::automode::REGULAR;
@@ -185,6 +186,14 @@ float ImpressionistDoc::getDissolveAlpha()
 }
 
 //---------------------------------------------------------
+// Returns the background alpha
+//---------------------------------------------------------
+float ImpressionistDoc::getBackgroundAlpha()
+{
+	return m_pUI->getBackgroundAlpha();
+}
+
+//---------------------------------------------------------
 // Load the specified image
 // This is called by the UI when the load image button is 
 // pressed.
@@ -241,6 +250,8 @@ int ImpressionistDoc::loadImage(char *iname, bool mural)
 		memset(m_ucPainting, 0, width*height * 3);
 		m_ucsave = new unsigned char[width*height * 3];
 		memset(m_ucsave, 0, width*height * 3);
+		m_ucActualMap = new unsigned char[width*height * 3];
+		memset(m_ucActualMap, 0, width*height * 3);
 	}
 	// For the mural effect. Extra credit features.
 	else {
