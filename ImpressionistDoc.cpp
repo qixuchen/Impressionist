@@ -34,6 +34,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
 	m_ucGradient = NULL;
+	m_ucAlpha = NULL;
 
 	m_nAngleType = ImpressionistUI::SLIDER_RIGHT_MOUSE;
 	m_nAutoType = ImpressionistUI::automode::REGULAR;
@@ -266,7 +267,7 @@ int ImpressionistDoc::loadImage(char *iname, bool mural)
 }
 
 //---------------------------------------------------------
-// Load the specified image
+// Load the specified image to represent gradient
 // This is called by the UI when the load image button is 
 // pressed.
 //---------------------------------------------------------
@@ -295,6 +296,36 @@ int ImpressionistDoc::loadGrad(char *iname)
 	return 1;
 }
 
+
+//---------------------------------------------------------
+// Load the specified image to represent Alpha
+// This is called by the UI when the load image button is 
+// pressed.
+//---------------------------------------------------------
+int ImpressionistDoc::loadAlpha(char *iname)
+{
+	// try to open the image to read
+	unsigned char*	data;
+	int				width, height;
+
+	if ((data = readBMP(iname, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	// reflect the fact of loading the new image
+	m_nAlphaWidth = width;
+	m_nAlphaHeight = height;
+
+	// release old storage
+	if (m_ucAlpha) delete[] m_ucAlpha;
+
+	m_ucAlpha = data;
+
+
+	return 1;
+}
 
 //----------------------------------------------------------------
 // Save the specified image
@@ -395,12 +426,21 @@ GLubyte* ImpressionistDoc::GetGradPixel(int x, int y)
 }
 
 //----------------------------------------------------------------
-// Get pixel of the grad iamge
+// Get pixel of the grad image
 //----------------------------------------------------------------
 GLubyte* ImpressionistDoc::GetGradPixel(const Point p)
 {
 	return GetGradPixel(p.x, p.y);
 }
+
+//----------------------------------------------------------------
+// Get pixel of the alpha image
+//----------------------------------------------------------------
+GLubyte* ImpressionistDoc::GetAlphaPixel(const Point p)
+{
+	return (GLubyte*)(m_ucAlpha + 3 * (p.y*m_nAlphaWidth + p.x));
+}
+
 
 /*void ImpressionistDoc::swapOriginPaint() {
 	unsigned char* temp = NULL;

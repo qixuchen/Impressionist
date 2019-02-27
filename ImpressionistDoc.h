@@ -22,6 +22,7 @@ public:
 	int		loadImage(char *iname, bool mural = false);			// called by the UI to load image
 	int		saveImage(char *iname);			// called by the UI to save image
 	int		loadGrad(char *iname);			// called by the UI to load  GRADIENT image
+	int		loadAlpha(char *iname);			// called by the UI to load  ALPHA image
 
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
@@ -62,6 +63,9 @@ public:
 	int				m_nGradWidth,
 					m_nGradHeight;
 
+	//Dimensions of the alpha image window.
+	int				m_nAlphaWidth,
+					m_nAlphaHeight;
 
 	// Bitmaps for original image and painting.
 	unsigned char*	m_ucBitmap;
@@ -71,6 +75,9 @@ public:
 
 	//Bitmaps for gradient.
 	unsigned char* m_ucGradient;
+
+	//Bitmaps for alpha
+	unsigned char* m_ucAlpha;
 
 
 	// The current active brush.
@@ -99,6 +106,8 @@ public:
 	GLubyte* GetPaintingPixel(int x, int y);
 	GLubyte* GetPaintingPixel(const Point p);
 
+
+	GLubyte* GetAlphaPixel(const Point p);
 private:
 	char			m_imageName[256];
 

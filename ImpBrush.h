@@ -49,6 +49,8 @@ public:
 	// according to the source image and the position, determine the draw color
 	void SetColor( const Point source );
 
+	float SetPaintAlpha(const Point source);
+
 	// Calculate the difference between two colors.
 	double calDiff(const Point source, const Point target);
 

@@ -208,6 +208,20 @@ void ImpressionistUI::cb_load_grad(Fl_Menu_* o, void* v)
 	whoami(o)->AngleTypeMenu[FOLLOW_ANOTHER_IMAGE].activate();
 }
 
+
+//------------------------------------------------------------------
+// load alpha image
+//------------------------------------------------------------------
+void ImpressionistUI::cb_load_alpha(Fl_Menu_* o, void* v)
+{
+	ImpressionistDoc *pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadAlpha(newfile);
+	}
+}
+
 //------------------------------------------------------------------
 // Brings up a file chooser and then saves the painted image
 // This is called by the UI when the save image menu item is chosen
@@ -586,6 +600,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback *)ImpressionistUI::cb_clear_canvas, 0, FL_MENU_DIVIDER },
 		{ "&Color",	FL_ALT + 'o', (Fl_Callback *)ImpressionistUI::cb_Color },
 		{ "&Import Gradient Image",	FL_ALT + 'i', (Fl_Callback *)ImpressionistUI::cb_load_grad },
+		{ "&Import Alpha map",	FL_ALT + 'i', (Fl_Callback *)ImpressionistUI::cb_load_alpha },
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
 
