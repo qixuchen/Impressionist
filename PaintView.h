@@ -38,6 +38,7 @@ public:
 
 	void SwapOrgPnt();
 
+	void Dissolve();
 	ImpressionistDoc *m_pDoc;
 
 	// All these painting methods are implemented in the draw() function as an event_To_Do.
@@ -50,9 +51,13 @@ public:
 
 	void edgePaint();
 
+	void clearBackground(float alpha);
+	void addBackground(float alpha);
+
 
 private:
 	GLvoid* m_pPaintBitstart;
+	GLvoid* m_pActualBitstart;
 	int		m_nDrawWidth,
 			m_nDrawHeight,
 			m_nStartRow, 
